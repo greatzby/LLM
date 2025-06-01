@@ -30,6 +30,8 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.distributed import init_process_group, destroy_process_group
 import networkx as nx
 import re 
+# ADDED
+import matplotlib.pyplot as plt
 
 from model import GPTConfig, GPT
 from logger import get_logger
@@ -47,7 +49,8 @@ parser.add_argument('--n_embd', type=int, default=120, help='Size of the embeddi
 parser.add_argument('--max_iters', type=int, default=10000, help='Number of Iterations (default: 10000)')
 parser.add_argument('--num_nodes', type=int, default=100, help='Number of Nodes (default: 100)')
 parser.add_argument('--num_of_paths', type=int, default=20, help='Number of Paths (default: 1)')
-
+# ADDED
+parser.add_argument('--test_interval', type=int, default=500, help='Interval (iterations) for testing accuracy on the validation set')
 
 args = parser.parse_args()
 
@@ -184,6 +187,19 @@ def get_batch(split):
     else:
         x, y = x.to(device), y.to(device)
     return x, y
+
+
+# ADDED: Define the test_model() function to calculate the token level accuracy on the verification set
+@torch.no_grad()
+def test_model():
+    X, Y = get_batch('val')
+    with ctx:
+        logits, _ = model(X, Y)
+    preds = torch.argmax(logits, dim=-1)
+    correct = (preds == Y).float().sum().item()
+    total = Y.numel()
+    return correct / total
+
 
 
 # init these up here, can override if init_from='resume' (i.e. from a checkpoint)
@@ -332,6 +348,12 @@ if wandb_log and master_process:
     import wandb
     wandb.init(project=wandb_project, name=wandb_run_name, config=config)
 
+# ADDED: Define a list for recording training losses and test accuracy
+train_loss_history = []
+train_iter_history = []
+test_accuracy_history = []
+test_iter_history = []
+
 
 
 # training loop
@@ -389,6 +411,14 @@ while True:
                 else:
                     torch.save(checkpoint, os.path.join(out_dir, f'{iter_num}_ckpt_{num_of_paths}.pt'))
 
+    # ADDED: Test every test_interval and record the test accuracy
+    if iter_num % args.test_interval == 0 and master_process:
+        test_acc = test_model()
+        test_accuracy_history.append(test_acc)
+        test_iter_history.append(iter_num)
+        print(f"Test Accuracy at iter {iter_num}: {test_acc:.4f}")
+        logger.info(f"Test Accuracy at iter {iter_num}: {test_acc:.4f}")
+
     # if iter_num % test_interval == 0 and master_process:
     #     correct, tot = test_model()
     #     corrects.append(correct)
@@ -422,6 +452,12 @@ while True:
     t0 = t1
     if iter_num % log_interval == 0 and master_process:
         lossf = loss.item() * gradient_accumulation_steps
+
+        # ADDED: Record the training loss and corresponding iteration steps for subsequent mapping
+        train_loss_history.append(lossf)
+        train_iter_history.append(iter_num)
+
+        
         if local_iter_num >= 5: # let the training loop settle a bit
             mfu = raw_model.estimate_mfu(batch_size * gradient_accumulation_steps, dt)
             running_mfu = mfu if running_mfu == -1.0 else 0.9*running_mfu + 0.1*mfu
@@ -436,6 +472,28 @@ while True:
 
 torch.save(torch.tensor(corrects).cpu(), os.path.join(out_dir, f'corrects.pt'))
 torch.save(torch.tensor(totals).cpu(), os.path.join(out_dir, f'totals.pt'))
+
+# ADDED: Draw the training curve and test accuracy curve, and save the image
+if master_process:
+    plt.figure(figsize=(12, 5))
+
+    plt.subplot(1, 2, 1)
+    plt.plot(train_iter_history, train_loss_history, marker='o')
+    plt.xlabel('Iteration')
+    plt.ylabel('Training Loss')
+    plt.title('Training Loss Curve')
+
+    plt.subplot(1, 2, 2)
+    plt.plot(test_iter_history, test_accuracy_history, marker='o', color='green')
+    plt.xlabel('Iteration')
+    plt.ylabel('Test Accuracy')
+    plt.title('Test Accuracy Curve')
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, "training_curves.png"))
+    plt.show()
+
+
 
 if ddp:
     destroy_process_group()
