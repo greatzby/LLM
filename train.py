@@ -50,7 +50,7 @@ parser.add_argument('--max_iters', type=int, default=10000, help='Number of Iter
 parser.add_argument('--num_nodes', type=int, default=100, help='Number of Nodes (default: 100)')
 parser.add_argument('--num_of_paths', type=int, default=20, help='Number of Paths (default: 1)')
 # ADDED
-parser.add_argument('--test_interval', type=int, default=500, help='Interval (iterations) for testing accuracy on the validation set')
+parser.add_argument('--test_interval', type=int, default=200, help='Interval (iterations) for testing accuracy on the validation set')
 
 args = parser.parse_args()
 
@@ -495,7 +495,7 @@ if master_process:
 
 
     # ADDED: Plot zoomed-in curves for iterations 0 to 2000
-    zoom_iter_limit = 2000
+    zoom_iter_limit = 3000
     zoom_train_iter_history = [it for it in train_iter_history if it <= zoom_iter_limit]
     zoom_train_loss_history = [loss for it, loss in zip(train_iter_history, train_loss_history) if it <= zoom_iter_limit]
 
@@ -505,15 +505,15 @@ if master_process:
     plt.figure(figsize=(12, 5))
     plt.subplot(1, 2, 1)
     plt.plot(zoom_train_iter_history, zoom_train_loss_history, marker='o')
-    plt.xlabel('Iteration (0 to 2000)')
+    plt.xlabel('Iteration (0 to 3000)')
     plt.ylabel('Training Loss')
-    plt.title('Zoomed Training Loss Curve (0-2000)')
+    plt.title('Zoomed Training Loss Curve (0-3000)')
 
     plt.subplot(1, 2, 2)
     plt.plot(zoom_test_iter_history, zoom_test_accuracy_history, marker='o', color='green')
-    plt.xlabel('Iteration (0 to 2000)')
+    plt.xlabel('Iteration (0 to 3000)')
     plt.ylabel('Test Accuracy')
-    plt.title('Zoomed Test Accuracy Curve (0-2000)')
+    plt.title('Zoomed Test Accuracy Curve (0-3000)')
 
     plt.tight_layout()
     plt.savefig(os.path.join(out_dir, "training_curves_zoom.png"))
