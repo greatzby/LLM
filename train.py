@@ -494,6 +494,32 @@ if master_process:
     plt.show()
 
 
+    # ADDED: Plot zoomed-in curves for iterations 0 to 2000
+    zoom_iter_limit = 2000
+    zoom_train_iter_history = [it for it in train_iter_history if it <= zoom_iter_limit]
+    zoom_train_loss_history = [loss for it, loss in zip(train_iter_history, train_loss_history) if it <= zoom_iter_limit]
+
+    zoom_test_iter_history = [it for it in test_iter_history if it <= zoom_iter_limit]
+    zoom_test_accuracy_history = [acc for it, acc in zip(test_iter_history, test_accuracy_history) if it <= zoom_iter_limit]
+
+    plt.figure(figsize=(12, 5))
+    plt.subplot(1, 2, 1)
+    plt.plot(zoom_train_iter_history, zoom_train_loss_history, marker='o')
+    plt.xlabel('Iteration (0 to 2000)')
+    plt.ylabel('Training Loss')
+    plt.title('Zoomed Training Loss Curve (0-2000)')
+
+    plt.subplot(1, 2, 2)
+    plt.plot(zoom_test_iter_history, zoom_test_accuracy_history, marker='o', color='green')
+    plt.xlabel('Iteration (0 to 2000)')
+    plt.ylabel('Test Accuracy')
+    plt.title('Zoomed Test Accuracy Curve (0-2000)')
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, "training_curves_zoom.png"))
+    plt.show()
+
+
 
 if ddp:
     destroy_process_group()
