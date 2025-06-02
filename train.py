@@ -515,6 +515,9 @@ if master_process:
     plt.ylabel('Test Accuracy')
     plt.title('Zoomed Test Accuracy Curve (0-3000)')
 
+    model_setting = f"{n_layer}-{n_head}-{n_embd}-{num_nodes}"
+    plt.suptitle(f"Model Settings: {model_setting}", fontsize=16)
+
     plt.tight_layout()
     plt.savefig(os.path.join(out_dir, "training_curves_zoom.png"))
     plt.show()
