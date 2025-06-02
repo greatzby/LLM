@@ -50,7 +50,7 @@ parser.add_argument('--max_iters', type=int, default=10000, help='Number of Iter
 parser.add_argument('--num_nodes', type=int, default=100, help='Number of Nodes (default: 100)')
 parser.add_argument('--num_of_paths', type=int, default=20, help='Number of Paths (default: 1)')
 # ADDED
-parser.add_argument('--test_interval', type=int, default=200, help='Interval (iterations) for testing accuracy on the validation set')
+parser.add_argument('--test_interval', type=int, default=100, help='Interval (iterations) for testing accuracy on the validation set')
 
 args = parser.parse_args()
 
