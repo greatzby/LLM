@@ -120,3 +120,125 @@ iter 9900: loss 0.6959
 step 10000: train loss 0.6970, val loss 1.6092
 saving checkpoint to {out_dir}
 iter 10000: loss 0.7085
+step 0: train loss 4.7312, val loss 4.7222
+iter 0: loss 4.7242
+iter 300: loss 1.0472
+iter 600: loss 0.8035
+iter 900: loss 0.7769
+iter 1200: loss 0.7615
+iter 1500: loss 0.7394
+iter 1800: loss 0.7581
+iter 2100: loss 0.7374
+iter 2400: loss 0.7244
+iter 2700: loss 0.7236
+step 3000: train loss 0.7254, val loss 1.3972
+saving checkpoint to {out_dir}
+iter 3000: loss 0.7318
+iter 3300: loss 0.7197
+iter 3600: loss 0.7185
+iter 3900: loss 0.7135
+iter 4200: loss 0.7271
+iter 4500: loss 0.7144
+iter 4800: loss 0.7316
+iter 5100: loss 0.7129
+iter 5400: loss 0.7029
+iter 5700: loss 0.7186
+step 6000: train loss 0.7120, val loss 1.5049
+saving checkpoint to {out_dir}
+iter 6000: loss 0.7212
+iter 6300: loss 0.7092
+iter 6600: loss 0.7167
+iter 6900: loss 0.7117
+iter 7200: loss 0.7056
+iter 7500: loss 0.7041
+iter 7800: loss 0.7029
+iter 8100: loss 0.7141
+iter 8400: loss 0.7170
+iter 8700: loss 0.7150
+step 9000: train loss 0.7076, val loss 1.5418
+saving checkpoint to {out_dir}
+iter 9000: loss 0.7067
+iter 9300: loss 0.6949
+iter 9600: loss 0.7152
+iter 9900: loss 0.7085
+iter 10200: loss 0.6952
+iter 10500: loss 0.7077
+iter 10800: loss 0.7008
+iter 11100: loss 0.7057
+iter 11400: loss 0.7065
+iter 11700: loss 0.6993
+step 12000: train loss 0.7036, val loss 1.5645
+saving checkpoint to {out_dir}
+iter 12000: loss 0.7039
+iter 12300: loss 0.7012
+iter 12600: loss 0.6999
+iter 12900: loss 0.7117
+iter 13200: loss 0.7024
+iter 13500: loss 0.7012
+iter 13800: loss 0.6947
+iter 14100: loss 0.6963
+iter 14400: loss 0.6910
+iter 14700: loss 0.7022
+step 15000: train loss 0.7016, val loss 1.5958
+saving checkpoint to {out_dir}
+iter 15000: loss 0.6940
+iter 15300: loss 0.7061
+iter 15600: loss 0.7001
+iter 15900: loss 0.7139
+iter 16200: loss 0.7023
+iter 16500: loss 0.6938
+iter 16800: loss 0.7021
+iter 17100: loss 0.7030
+iter 17400: loss 0.6950
+iter 17700: loss 0.7075
+step 18000: train loss 0.6997, val loss 1.6195
+saving checkpoint to {out_dir}
+iter 18000: loss 0.6975
+iter 18300: loss 0.7113
+iter 18600: loss 0.7000
+iter 18900: loss 0.6965
+iter 19200: loss 0.7017
+iter 19500: loss 0.7045
+iter 19800: loss 0.6891
+iter 20100: loss 0.6914
+iter 20400: loss 0.6947
+iter 20700: loss 0.7000
+step 21000: train loss 0.6978, val loss 1.6453
+saving checkpoint to {out_dir}
+iter 21000: loss 0.7004
+iter 21300: loss 0.6842
+iter 21600: loss 0.7037
+iter 21900: loss 0.6883
+iter 22200: loss 0.7014
+iter 22500: loss 0.6921
+iter 22800: loss 0.6920
+iter 23100: loss 0.6986
+iter 23400: loss 0.6983
+iter 23700: loss 0.7042
+step 24000: train loss 0.6965, val loss 1.6621
+saving checkpoint to {out_dir}
+iter 24000: loss 0.6928
+iter 24300: loss 0.7080
+iter 24600: loss 0.7018
+iter 24900: loss 0.6968
+iter 25200: loss 0.6829
+iter 25500: loss 0.6945
+iter 25800: loss 0.7050
+iter 26100: loss 0.7000
+iter 26400: loss 0.6929
+iter 26700: loss 0.7009
+step 27000: train loss 0.6955, val loss 1.6869
+saving checkpoint to {out_dir}
+iter 27000: loss 0.6902
+iter 27300: loss 0.6985
+iter 27600: loss 0.6848
+iter 27900: loss 0.6941
+iter 28200: loss 0.6936
+iter 28500: loss 0.6828
+iter 28800: loss 0.6999
+iter 29100: loss 0.7053
+iter 29400: loss 0.6958
+iter 29700: loss 0.6880
+step 30000: train loss 0.6951, val loss 1.7027
+saving checkpoint to {out_dir}
+iter 30000: loss 0.6924
