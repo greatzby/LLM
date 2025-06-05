@@ -1,0 +1,7 @@
+{
+  "checkpoint": "out/simple_graph_1_1_120_100/5000_ckpt_20.pt",
+  "num_nodes": 100,
+  "weight_gap": 0.03224414214491844,
+  "avg_edge_weight": 0.03552545607089996,
+  "avg_non_edge_weight": 0.0032813125289976597
+}
