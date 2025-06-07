@@ -32,8 +32,8 @@ def plot_heatmap_with_adjacency(matrix, adjacency_matrix, title="WM_prime", save
                 plt.gca().add_patch(rect)
     
     plt.title(f"{title} (First {show_first_n}x{show_first_n})")
-    plt.xlabel("Columns")
-    plt.ylabel("Rows")
+    plt.xlabel("Target Node (j)")
+    plt.ylabel("Source Node (i)")
     plt.tight_layout()
     
     filename = f"{state_tag}_{title}_with_adjacency.png"
@@ -54,8 +54,8 @@ def plot_simple_heatmap(matrix, title="Heatmap", save_dir=".", state_tag="state"
     plt.imshow(matrix, cmap='viridis', aspect='auto')
     plt.colorbar()
     plt.title(title)
-    plt.xlabel("Columns")
-    plt.ylabel("Rows")
+    plt.xlabel("Target Node (j)")
+    plt.ylabel("Source Node (i)")
     plt.tight_layout()
     
     filename = f"{state_tag}_{title.replace(' ', '_')}.png"
@@ -64,33 +64,194 @@ def plot_simple_heatmap(matrix, title="Heatmap", save_dir=".", state_tag="state"
     print(f"Saved '{title}' heatmap to: {full_path}")
     plt.close()
 
-def calculate_weight_gap(WM_matrix, adjacency_matrix):
+def verify_adjacency_matrix(adjacency_matrix):
+    """验证邻接矩阵的属性"""
+    # 检查是否对称（无向图）
+    is_symmetric = np.allclose(adjacency_matrix, adjacency_matrix.T)
+    print(f"\nAdjacency matrix is symmetric: {is_symmetric}")
+    
+    # 统计边数
+    total_edges = np.sum(adjacency_matrix)
+    
+    if is_symmetric:
+        num_edges = np.sum(adjacency_matrix[np.triu_indices_from(adjacency_matrix, k=1)])
+        print(f"Graph type: Undirected")
+        print(f"Number of edges: {num_edges}")
+    else:
+        print(f"Graph type: Directed")
+        print(f"Number of directed edges: {total_edges}")
+        # 检查有多少双向边
+        bidirectional = 0
+        for i in range(adjacency_matrix.shape[0]):
+            for j in range(i+1, adjacency_matrix.shape[1]):
+                if adjacency_matrix[i,j] == 1 and adjacency_matrix[j,i] == 1:
+                    bidirectional += 1
+        print(f"Number of bidirectional edges: {bidirectional}")
+    
+    # 计算入度和出度
+    out_degrees = np.sum(adjacency_matrix, axis=1)
+    in_degrees = np.sum(adjacency_matrix, axis=0)
+    
+    print(f"Average out-degree: {np.mean(out_degrees):.2f}")
+    print(f"Average in-degree: {np.mean(in_degrees):.2f}")
+    print(f"Max out-degree: {np.max(out_degrees)}")
+    print(f"Max in-degree: {np.max(in_degrees)}")
+    
+    return is_symmetric
+
+def calculate_weight_gap(WM_matrix, adjacency_matrix, directed=True):
     """
     Calculate the average weight gap between edges and non-edges.
-    Following the paper: only consider i < j positions.
+    For directed graphs: considers all (i,j) pairs where i≠j
+    For undirected graphs: only considers i<j pairs
     """
     num_nodes = adjacency_matrix.shape[0]
     edge_weights = []
     non_edge_weights = []
     
-    for i in range(num_nodes):
-        for j in range(i+1, num_nodes):  # Only upper triangular (i < j)
-            if adjacency_matrix[i, j] == 1:
-                edge_weights.append(WM_matrix[i, j])
-            else:
-                non_edge_weights.append(WM_matrix[i, j])
+    if directed:
+        # For directed graphs, consider all pairs except self-loops
+        for i in range(num_nodes):
+            for j in range(num_nodes):
+                if i != j:  # Exclude self-loops
+                    if adjacency_matrix[i, j] == 1:
+                        edge_weights.append(WM_matrix[i, j])
+                    else:
+                        non_edge_weights.append(WM_matrix[i, j])
+    else:
+        # For undirected graphs, only consider upper triangular
+        for i in range(num_nodes):
+            for j in range(i+1, num_nodes):
+                if adjacency_matrix[i, j] == 1:
+                    edge_weights.append(WM_matrix[i, j])
+                else:
+                    non_edge_weights.append(WM_matrix[i, j])
     
     avg_edge_weight = np.mean(edge_weights) if edge_weights else 0
     avg_non_edge_weight = np.mean(non_edge_weights) if non_edge_weights else 0
     weight_gap = avg_edge_weight - avg_non_edge_weight
     
+    print(f"\nWeight gap analysis:")
     print(f"Number of edges: {len(edge_weights)}")
     print(f"Number of non-edges: {len(non_edge_weights)}")
-    print(f"Average edge weight: {avg_edge_weight:.4f}")
-    print(f"Average non-edge weight: {avg_non_edge_weight:.4f}")
-    print(f"Weight gap: {weight_gap:.4f}")
+    print(f"Average edge weight: {avg_edge_weight:.6f}")
+    print(f"Average non-edge weight: {avg_non_edge_weight:.6f}")
+    print(f"Weight gap: {weight_gap:.6f}")
+    print(f"Edge/Non-edge ratio: {avg_edge_weight / (avg_non_edge_weight + 1e-10):.2f}")
+    
+    # Additional statistics
+    if edge_weights:
+        print(f"\nEdge weight statistics:")
+        print(f"  Min: {np.min(edge_weights):.6f}")
+        print(f"  Max: {np.max(edge_weights):.6f}")
+        print(f"  Std: {np.std(edge_weights):.6f}")
+    
+    if non_edge_weights:
+        print(f"\nNon-edge weight statistics:")
+        print(f"  Min: {np.min(non_edge_weights):.6f}")
+        print(f"  Max: {np.max(non_edge_weights):.6f}")
+        print(f"  Std: {np.std(non_edge_weights):.6f}")
+        print(f"  Percentage positive: {100 * np.sum(np.array(non_edge_weights) > 0) / len(non_edge_weights):.2f}%")
     
     return weight_gap, avg_edge_weight, avg_non_edge_weight
+
+def analyze_weight_distribution(WM_matrix, adjacency_matrix, save_dir, state_tag):
+    """
+    Analyze and plot the distribution of edge and non-edge weights.
+    """
+    edge_weights = []
+    non_edge_weights = []
+    
+    num_nodes = adjacency_matrix.shape[0]
+    for i in range(num_nodes):
+        for j in range(num_nodes):
+            if i != j:  # Exclude self-loops
+                if adjacency_matrix[i, j] == 1:
+                    edge_weights.append(WM_matrix[i, j])
+                else:
+                    non_edge_weights.append(WM_matrix[i, j])
+    
+    # Plot weight distributions
+    plt.figure(figsize=(12, 5))
+    
+    # Subplot 1: Histograms
+    plt.subplot(1, 2, 1)
+    bins = np.linspace(min(min(edge_weights), min(non_edge_weights)), 
+                      max(max(edge_weights), max(non_edge_weights)), 50)
+    plt.hist(edge_weights, bins=bins, alpha=0.6, label=f'Edges (n={len(edge_weights)})', color='green')
+    plt.hist(non_edge_weights, bins=bins, alpha=0.6, label=f'Non-edges (n={len(non_edge_weights)})', color='red')
+    plt.axvline(np.mean(edge_weights), color='darkgreen', linestyle='--', label=f'Edge mean: {np.mean(edge_weights):.4f}')
+    plt.axvline(np.mean(non_edge_weights), color='darkred', linestyle='--', label=f'Non-edge mean: {np.mean(non_edge_weights):.4f}')
+    plt.xlabel('Weight Value')
+    plt.ylabel('Count')
+    plt.title('Distribution of Edge vs Non-edge Weights')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    
+    # Subplot 2: Box plots
+    plt.subplot(1, 2, 2)
+    data_to_plot = [edge_weights, non_edge_weights]
+    bp = plt.boxplot(data_to_plot, labels=['Edges', 'Non-edges'], patch_artist=True)
+    bp['boxes'][0].set_facecolor('green')
+    bp['boxes'][1].set_facecolor('red')
+    plt.ylabel('Weight Value')
+    plt.title('Weight Distribution Comparison')
+    plt.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    filename = f"{state_tag}_weight_distributions.png"
+    full_path = os.path.join(save_dir, filename)
+    plt.savefig(full_path, dpi=150)
+    print(f"Saved weight distribution plot to: {full_path}")
+    plt.close()
+
+def analyze_direct_output_weights(model, num_nodes, adjacency_matrix, token_offset=2):
+    """
+    Directly analyze the output layer weights without FFN transformation.
+    This gives us the 'raw' weights before any non-linear transformations.
+    """
+    print("\n" + "="*60)
+    print("ANALYZING DIRECT OUTPUT WEIGHTS (without FFN)")
+    print("="*60)
+    
+    W_o = model.lm_head.weight  # (vocab_size, d_model)
+    W_t = model.transformer.wte.weight  # (vocab_size, d_model)
+    
+    # For each node pair (i,j), compute the direct weight: W_t[i]^T @ W_o[j]
+    num_nodes_actual = min(num_nodes, W_t.shape[0] - token_offset)
+    direct_weights = np.zeros((num_nodes_actual, num_nodes_actual))
+    
+    with torch.no_grad():
+        for i in range(num_nodes_actual):
+            for j in range(num_nodes_actual):
+                # Direct weight from node i to node j
+                token_i = i + token_offset
+                token_j = j + token_offset
+                weight = torch.dot(W_t[token_i], W_o[token_j]).item()
+                direct_weights[i, j] = weight
+    
+    # Calculate weight gap for direct weights
+    edge_weights = []
+    non_edge_weights = []
+    
+    for i in range(num_nodes_actual):
+        for j in range(num_nodes_actual):
+            if i != j and i < adjacency_matrix.shape[0] and j < adjacency_matrix.shape[1]:
+                if adjacency_matrix[i, j] == 1:
+                    edge_weights.append(direct_weights[i, j])
+                else:
+                    non_edge_weights.append(direct_weights[i, j])
+    
+    avg_edge = np.mean(edge_weights) if edge_weights else 0
+    avg_non_edge = np.mean(non_edge_weights) if non_edge_weights else 0
+    
+    print(f"\nDirect weight statistics (without FFN):")
+    print(f"Average edge weight: {avg_edge:.6f}")
+    print(f"Average non-edge weight: {avg_non_edge:.6f}")
+    print(f"Weight gap: {avg_edge - avg_non_edge:.6f}")
+    print(f"Percentage of positive non-edge weights: {100 * np.sum(np.array(non_edge_weights) > 0) / len(non_edge_weights):.2f}%")
+    
+    return direct_weights
 
 def load_adjacency_matrix(adj_path, num_nodes):
     """
@@ -228,6 +389,9 @@ def main():
         print("\nLoading adjacency matrix...")
         adjacency_matrix = load_adjacency_matrix(args.adjacency, args.num_nodes)
         
+        # Verify if it's directed or undirected
+        is_symmetric = verify_adjacency_matrix(adjacency_matrix)
+        
         # Plot WM' with adjacency matrix overlay
         plot_heatmap_with_adjacency(WM_mat, adjacency_matrix, title="WM_prime", 
                                   save_dir=args.save_dir, state_tag=state_tag, 
@@ -235,7 +399,15 @@ def main():
         
         # Calculate and display weight gap for WM'
         print("\nCalculating weight gap for WM':")
-        weight_gap, avg_edge, avg_non_edge = calculate_weight_gap(WM_mat, adjacency_matrix)
+        weight_gap, avg_edge, avg_non_edge = calculate_weight_gap(WM_mat, adjacency_matrix, 
+                                                                 directed=not is_symmetric)
+        
+        # Analyze weight distribution
+        analyze_weight_distribution(WM_mat, adjacency_matrix, args.save_dir, state_tag)
+        
+        # Analyze direct output weights (without FFN)
+        direct_weights = analyze_direct_output_weights(model, args.num_nodes, 
+                                                     adjacency_matrix, args.token_offset)
         
         # Save weight gap information
         gap_info = {
@@ -244,12 +416,13 @@ def main():
             "weight_gap": float(weight_gap),
             "avg_edge_weight": float(avg_edge),
             "avg_non_edge_weight": float(avg_non_edge),
-            "token_offset": args.token_offset
+            "token_offset": args.token_offset,
+            "graph_type": "directed" if not is_symmetric else "undirected"
         }
         gap_file = os.path.join(args.save_dir, f"{state_tag}_weight_gap.json")
         with open(gap_file, 'w') as f:
             json.dump(gap_info, f, indent=2)
-        print(f"Weight gap info saved to: {gap_file}")
+        print(f"\nWeight gap info saved to: {gap_file}")
     else:
         # Plot simple heatmaps without adjacency overlay
         print("\nNo adjacency matrix provided, plotting simple heatmaps...")
