@@ -1,6 +1,6 @@
 """
 analyze_predictions.py - 分析模型在不同训练阶段的预测分布变化
-特别关注8k-10k步的异常现象
+修正版：考虑node ID到token ID的偏移
 """
 
 import os
@@ -33,16 +33,26 @@ stoi, itos = meta['stoi'], meta['itos']
 block_size = meta['block_size']
 vocab_size = meta['vocab_size']
 
-# 加载邻接矩阵
-adjacency = np.load(os.path.join(data_dir, 'adjacency.npy'))
-
-# 加载图
+# 加载图（注意：这是有向图）
 graph_path = os.path.join(data_dir, "path_graph.graphml")
-if os.path.exists(graph_path):
-    G = nx.read_graphml(graph_path)
-else:
-    print("使用邻接矩阵构建图")
-    G = nx.from_numpy_array(adjacency)
+G = nx.read_graphml(graph_path)
+
+# 重要：建立node到token的映射
+NODE_OFFSET = 2  # 节点i对应token i+2
+
+def node_to_token(node_id):
+    """将节点ID转换为token ID"""
+    return node_id + NODE_OFFSET
+
+def token_to_node(token_id):
+    """将token ID转换为节点ID"""
+    if token_id < NODE_OFFSET:
+        return None  # PAD或\n
+    return token_id - NODE_OFFSET
+
+def get_successors(node):
+    """获取节点的所有后继节点（有向图）"""
+    return list(G.successors(str(node)))  # GraphML使用字符串作为节点ID
 
 def load_model(checkpoint_path):
     """加载模型checkpoint"""
@@ -75,22 +85,18 @@ def decode(l):
     """解码token序列为字符串"""
     return " ".join([itos[i] for i in l])
 
-def get_neighbors(node):
-    """获取节点的所有邻居"""
-    return list(np.where(adjacency[node] == 1)[0])
-
 def analyze_prediction_distribution(model, test_samples, num_samples=100):
-    """分析模型的预测分布特征"""
+    """分析模型的预测分布特征（修正版）"""
     results = {
-        'correct_token_prob': [],      # 正确答案的概率
-        'max_neighbor_prob': [],       # 所有邻居中的最大概率
-        'min_neighbor_prob': [],       # 所有邻居中的最小概率
-        'neighbor_prob_std': [],       # 邻居间概率的标准差
-        'avg_neighbor_prob': [],       # 邻居的平均概率
-        'avg_non_neighbor_prob': [],   # 非邻居的平均概率
-        'entropy': [],                 # 整个分布的熵
-        'correct_neighbor_rank': [],   # 正确答案在邻居中的排名
-        'neighbor_vs_non_neighbor_ratio': []  # 邻居/非邻居平均概率比
+        'correct_token_prob': [],      
+        'max_successor_prob': [],       
+        'min_successor_prob': [],       
+        'successor_prob_std': [],       
+        'avg_successor_prob': [],       
+        'avg_non_successor_prob': [],   
+        'entropy': [],                 
+        'correct_successor_rank': [],   
+        'successor_vs_non_successor_ratio': []
     }
     
     analyzed = 0
@@ -115,36 +121,46 @@ def analyze_prediction_distribution(model, test_samples, num_samples=100):
                 logits = logits[0, -1, :]  # 取最后一个位置的logits
                 probs = F.softmax(logits, dim=-1).cpu().numpy()
                 
-                # 获取邻居和非邻居
-                neighbors = get_neighbors(current_node)
-                non_neighbors = [i for i in range(num_nodes) if i not in neighbors and i != current_node]
+                # 获取后继节点（有向图）
+                successors = get_successors(current_node)
+                successors = [int(s) for s in successors]  # 转换为整数
                 
-                if correct_next not in neighbors:
+                if correct_next not in successors:
                     continue  # 跳过错误的ground truth
                 
+                # 转换到token空间
+                successor_tokens = [node_to_token(n) for n in successors]
+                non_successor_nodes = [i for i in range(num_nodes) 
+                                      if i not in successors and i != current_node]
+                non_successor_tokens = [node_to_token(n) for n in non_successor_nodes]
+                
                 # 计算统计量
-                neighbor_probs = probs[neighbors]
-                non_neighbor_probs = probs[non_neighbors]
+                successor_probs = probs[successor_tokens]
+                non_successor_probs = probs[non_successor_tokens]
                 
-                results['correct_token_prob'].append(probs[correct_next])
-                results['max_neighbor_prob'].append(neighbor_probs.max())
-                results['min_neighbor_prob'].append(neighbor_probs.min())
-                results['neighbor_prob_std'].append(neighbor_probs.std())
-                results['avg_neighbor_prob'].append(neighbor_probs.mean())
-                results['avg_non_neighbor_prob'].append(non_neighbor_probs.mean())
+                correct_token = node_to_token(correct_next)
+                results['correct_token_prob'].append(probs[correct_token])
+                results['max_successor_prob'].append(successor_probs.max())
+                results['min_successor_prob'].append(successor_probs.min())
+                results['successor_prob_std'].append(successor_probs.std())
+                results['avg_successor_prob'].append(successor_probs.mean())
+                results['avg_non_successor_prob'].append(non_successor_probs.mean())
                 
-                # 计算熵
-                entropy = -(probs * np.log(probs + 1e-10)).sum()
+                # 计算熵（只考虑有效的节点token）
+                node_tokens = list(range(NODE_OFFSET, NODE_OFFSET + num_nodes))
+                node_probs = probs[node_tokens]
+                node_probs = node_probs / node_probs.sum()  # 重新归一化
+                entropy = -(node_probs * np.log(node_probs + 1e-10)).sum()
                 results['entropy'].append(entropy)
                 
-                # 正确答案在邻居中的排名
-                correct_prob = probs[correct_next]
-                rank = sum(1 for p in neighbor_probs if p > correct_prob) + 1
-                results['correct_neighbor_rank'].append(rank)
+                # 正确答案在后继节点中的排名
+                correct_prob = probs[correct_token]
+                rank = sum(1 for p in successor_probs if p > correct_prob) + 1
+                results['correct_successor_rank'].append(rank)
                 
-                # 邻居vs非邻居比率
-                ratio = neighbor_probs.mean() / (non_neighbor_probs.mean() + 1e-10)
-                results['neighbor_vs_non_neighbor_ratio'].append(ratio)
+                # 后继vs非后继比率
+                ratio = successor_probs.mean() / (non_successor_probs.mean() + 1e-10)
+                results['successor_vs_non_successor_ratio'].append(ratio)
                 
                 analyzed += 1
                 if analyzed >= num_samples:
@@ -157,8 +173,7 @@ def analyze_prediction_distribution(model, test_samples, num_samples=100):
     return results
 
 def analyze_specific_examples(checkpoints, test_samples, num_examples=5):
-    """分析具体例子在不同checkpoint的预测变化"""
-    # 选择固定的测试样本
+    """分析具体例子在不同checkpoint的预测变化（修正版）"""
     selected_samples = test_samples[:num_examples]
     
     for sample_idx, (prompt, full_path) in enumerate(selected_samples):
@@ -172,16 +187,17 @@ def analyze_specific_examples(checkpoints, test_samples, num_examples=5):
             continue
             
         # 选择路径中间的一个预测点
-        analyze_pos = min(5, len(path_nodes) - 2)  # 分析第5步或倒数第二步
+        analyze_pos = min(5, len(path_nodes) - 2)
         current_node = int(path_nodes[analyze_pos])
         correct_next = int(path_nodes[analyze_pos + 1])
         
         print(f"Analyzing step {analyze_pos}: {current_node} -> ?")
         print(f"Correct next: {correct_next}")
         
-        neighbors = get_neighbors(current_node)
-        print(f"Neighbors of {current_node}: {neighbors}")
-        print(f"Is correct next a neighbor? {correct_next in neighbors}")
+        successors = get_successors(current_node)
+        successors = [int(s) for s in successors]
+        print(f"Successors of {current_node}: {successors}")
+        print(f"Is correct next a successor? {correct_next in successors}")
         
         # 构建输入
         input_seq = encode(" ".join(path_nodes[:analyze_pos+1]))
@@ -202,22 +218,25 @@ def analyze_specific_examples(checkpoints, test_samples, num_examples=5):
             
             print(f"\n--- Checkpoint {ckpt} ---")
             
-            # 显示top 10预测
+            # 显示top 10预测（转换回节点ID）
             top_k_indices = probs.argsort()[-10:][::-1]
-            for rank, idx in enumerate(top_k_indices):
-                if idx >= num_nodes:
+            for rank, token_idx in enumerate(top_k_indices):
+                node_id = token_to_node(token_idx)
+                if node_id is None or node_id >= num_nodes:
                     continue
-                is_neighbor = "✓" if idx in neighbors else "✗"
-                is_correct = "★" if idx == correct_next else " "
-                print(f"{rank+1}. {is_correct}{is_neighbor} Node {idx}: {probs[idx]:.4f}")
+                is_successor = "✓" if node_id in successors else "✗"
+                is_correct = "★" if node_id == correct_next else " "
+                print(f"{rank+1}. {is_correct}{is_successor} Node {node_id}: {probs[token_idx]:.4f}")
             
-            # 显示邻居概率统计
-            neighbor_probs = probs[neighbors]
-            print(f"\nNeighbor statistics:")
-            print(f"  Max: {neighbor_probs.max():.4f}, Min: {neighbor_probs.min():.4f}")
-            print(f"  Mean: {neighbor_probs.mean():.4f}, Std: {neighbor_probs.std():.4f}")
-            print(f"  Correct token prob: {probs[correct_next]:.4f}")
-            print(f"  Correct token rank among neighbors: {sum(1 for p in neighbor_probs if p > probs[correct_next]) + 1}/{len(neighbors)}")
+            # 显示后继节点概率统计
+            successor_tokens = [node_to_token(n) for n in successors]
+            successor_probs = probs[successor_tokens]
+            print(f"\nSuccessor statistics:")
+            print(f"  Max: {successor_probs.max():.4f}, Min: {successor_probs.min():.4f}")
+            print(f"  Mean: {successor_probs.mean():.4f}, Std: {successor_probs.std():.4f}")
+            correct_token = node_to_token(correct_next)
+            print(f"  Correct token prob: {probs[correct_token]:.4f}")
+            print(f"  Correct token rank among successors: {sum(1 for p in successor_probs if p > probs[correct_token]) + 1}/{len(successors)}")
 
 def load_test_samples():
     """加载测试样本"""
@@ -229,9 +248,8 @@ def load_test_samples():
             line = line.strip()
             if not line:
                 continue
-            # 假设格式是完整路径
-            prompt = line.split(':')[0] + ':' if ':' in line else line
-            samples.append((prompt, line))
+            # 格式：source target path...
+            samples.append(("", line))  # 不需要特别的prompt
     
     return samples
 
@@ -260,10 +278,10 @@ def main():
         # 打印关键统计
         print(f"Checkpoint {ckpt} summary:")
         print(f"  Avg correct token prob: {np.mean(results['correct_token_prob']):.4f}")
-        print(f"  Avg neighbor prob std: {np.mean(results['neighbor_prob_std']):.4f}")
-        print(f"  Avg neighbor/non-neighbor ratio: {np.mean(results['neighbor_vs_non_neighbor_ratio']):.2f}")
+        print(f"  Avg successor prob std: {np.mean(results['successor_prob_std']):.4f}")
+        print(f"  Avg successor/non-successor ratio: {np.mean(results['successor_vs_non_successor_ratio']):.2f}")
         print(f"  Avg entropy: {np.mean(results['entropy']):.4f}")
-        print(f"  Avg correct token rank: {np.mean(results['correct_neighbor_rank']):.2f}")
+        print(f"  Avg correct token rank: {np.mean(results['correct_successor_rank']):.2f}")
     
     # 2. 绘制关键指标随训练步数的变化
     plt.figure(figsize=(15, 10))
@@ -281,23 +299,23 @@ def main():
     plt.title('Average Probability of Correct Token')
     plt.legend()
     
-    # 2.2 邻居间概率的标准差
+    # 2.2 后继节点间概率的标准差
     plt.subplot(2, 3, 2)
-    values = [np.mean(all_results[c]['neighbor_prob_std']) for c in ckpt_list]
+    values = [np.mean(all_results[c]['successor_prob_std']) for c in ckpt_list]
     plt.plot(ckpt_list, values, marker='o')
     plt.axvline(x=8000, color='r', linestyle='--', alpha=0.5)
     plt.xlabel('Iteration')
     plt.ylabel('Std Dev')
-    plt.title('Std of Neighbor Probabilities\n(Lower = more uniform)')
+    plt.title('Std of Successor Probabilities\n(Lower = more uniform)')
     
-    # 2.3 邻居vs非邻居的概率比
+    # 2.3 后继vs非后继的概率比
     plt.subplot(2, 3, 3)
-    values = [np.mean(all_results[c]['neighbor_vs_non_neighbor_ratio']) for c in ckpt_list]
+    values = [np.mean(all_results[c]['successor_vs_non_successor_ratio']) for c in ckpt_list]
     plt.plot(ckpt_list, values, marker='o')
     plt.axvline(x=8000, color='r', linestyle='--', alpha=0.5)
     plt.xlabel('Iteration')
     plt.ylabel('Ratio')
-    plt.title('Neighbor/Non-neighbor Probability Ratio')
+    plt.title('Successor/Non-successor Probability Ratio')
     plt.yscale('log')
     
     # 2.4 预测分布的熵
@@ -311,15 +329,24 @@ def main():
     
     # 2.5 正确答案的平均排名
     plt.subplot(2, 3, 5)
-    values = [np.mean(all_results[c]['correct_neighbor_rank']) for c in ckpt_list]
+    values = [np.mean(all_results[c]['correct_successor_rank']) for c in ckpt_list]
     plt.plot(ckpt_list, values, marker='o')
     plt.axvline(x=8000, color='r', linestyle='--', alpha=0.5)
     plt.xlabel('Iteration')
     plt.ylabel('Average Rank')
-    plt.title('Average Rank of Correct Token\n(among neighbors)')
+    plt.title('Average Rank of Correct Token\n(among successors)')
+    
+    # 2.6 后继节点的平均概率
+    plt.subplot(2, 3, 6)
+    values = [np.mean(all_results[c]['avg_successor_prob']) for c in ckpt_list]
+    plt.plot(ckpt_list, values, marker='o')
+    plt.axvline(x=8000, color='r', linestyle='--', alpha=0.5)
+    plt.xlabel('Iteration')
+    plt.ylabel('Average Probability')
+    plt.title('Average Probability of Successor Nodes')
     
     plt.tight_layout()
-    plt.savefig(os.path.join(out_dir, 'prediction_distribution_analysis.png'), dpi=150)
+    plt.savefig(os.path.join(out_dir, 'prediction_distribution_analysis_fixed.png'), dpi=150)
     plt.show()
     
     # 3. 分析具体例子
@@ -336,14 +363,14 @@ def main():
     if 8000 in all_results and 10000 in all_results:
         print("\nComparing 8k vs 10k:")
         print(f"Correct token prob: {np.mean(all_results[8000]['correct_token_prob']):.4f} -> {np.mean(all_results[10000]['correct_token_prob']):.4f}")
-        print(f"Neighbor prob std: {np.mean(all_results[8000]['neighbor_prob_std']):.4f} -> {np.mean(all_results[10000]['neighbor_prob_std']):.4f}")
-        print(f"Neighbor/non-neighbor ratio: {np.mean(all_results[8000]['neighbor_vs_non_neighbor_ratio']):.2f} -> {np.mean(all_results[10000]['neighbor_vs_non_neighbor_ratio']):.2f}")
+        print(f"Successor prob std: {np.mean(all_results[8000]['successor_prob_std']):.4f} -> {np.mean(all_results[10000]['successor_prob_std']):.4f}")
+        print(f"Successor/non-successor ratio: {np.mean(all_results[8000]['successor_vs_non_successor_ratio']):.2f} -> {np.mean(all_results[10000]['successor_vs_non_successor_ratio']):.2f}")
         
-        # 检查是否邻居概率变得更均匀
-        std_8k = np.mean(all_results[8000]['neighbor_prob_std'])
-        std_10k = np.mean(all_results[10000]['neighbor_prob_std'])
+        # 检查后继节点概率是否变得更均匀
+        std_8k = np.mean(all_results[8000]['successor_prob_std'])
+        std_10k = np.mean(all_results[10000]['successor_prob_std'])
         if std_10k < std_8k * 0.5:
-            print("\n⚠️ 邻居间概率标准差大幅下降，表明模型失去了区分不同邻居的能力！")
+            print("\n⚠️ 后继节点间概率标准差大幅下降，表明模型失去了区分不同后继节点的能力！")
 
 if __name__ == "__main__":
     main()
