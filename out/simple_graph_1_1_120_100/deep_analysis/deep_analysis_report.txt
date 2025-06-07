@@ -1,0 +1,94 @@
+================================================================================
+DEEP ANALYSIS REPORT: LOGIT DISTRIBUTIONS AND SOFTMAX EFFECTS
+================================================================================
+
+
+Checkpoint 40000:
+----------------------------------------
+LOGIT STATISTICS:
+  Edge logits: mean=5.6125, std=5.3198
+  Non-edge logits: mean=-0.5162, std=3.0580
+  Logit gap (edge - non-edge): 6.1287
+  Correct answer logits: mean=16.4028
+  Other successor logits: mean=4.2426
+
+SOFTMAX AMPLIFICATION:
+  Median amplification: 907.0x
+  Mean amplification: 18366.4x
+  Max amplification: 975173.5x
+
+AFTER SOFTMAX:
+  Approx edge prob: 0.890871
+  Approx non-edge prob: 0.046601
+  Probability ratio: 19.1x
+
+Checkpoint 50000:
+----------------------------------------
+LOGIT STATISTICS:
+  Edge logits: mean=5.8009, std=5.4276
+  Non-edge logits: mean=-0.5445, std=3.1270
+  Logit gap (edge - non-edge): 6.3454
+  Correct answer logits: mean=16.7502
+  Other successor logits: mean=4.4108
+
+SOFTMAX AMPLIFICATION:
+  Median amplification: 1132.4x
+  Mean amplification: 18416.0x
+  Max amplification: 1130527.2x
+
+AFTER SOFTMAX:
+  Approx edge prob: 0.894368
+  Approx non-edge prob: 0.043870
+  Probability ratio: 20.4x
+
+Checkpoint 70000:
+----------------------------------------
+LOGIT STATISTICS:
+  Edge logits: mean=5.8051, std=5.5549
+  Non-edge logits: mean=-0.6354, std=3.2244
+  Logit gap (edge - non-edge): 6.4405
+  Correct answer logits: mean=17.1252
+  Other successor logits: mean=4.3680
+
+SOFTMAX AMPLIFICATION:
+  Median amplification: 1870.8x
+  Mean amplification: 54341.6x
+  Max amplification: 6646160.1x
+
+AFTER SOFTMAX:
+  Approx edge prob: 0.897833
+  Approx non-edge prob: 0.044692
+  Probability ratio: 20.1x
+
+Checkpoint 100000:
+----------------------------------------
+LOGIT STATISTICS:
+  Edge logits: mean=5.9004, std=5.7124
+  Non-edge logits: mean=-0.6387, std=3.2434
+  Logit gap (edge - non-edge): 6.5391
+  Correct answer logits: mean=17.5373
+  Other successor logits: mean=4.4230
+
+SOFTMAX AMPLIFICATION:
+  Median amplification: 2203.8x
+  Mean amplification: 58631.2x
+  Max amplification: 2954804.5x
+
+AFTER SOFTMAX:
+  Approx edge prob: 0.895014
+  Approx non-edge prob: 0.042077
+  Probability ratio: 21.3x
+
+
+================================================================================
+KEY FINDINGS:
+================================================================================
+
+Logit gap change from 40k to 100k:
+  40k: 6.1287
+  100k: 6.5391
+  Change: 0.4104 (6.7%)
+
+Softmax amplification change:
+  40k median: 907.0x
+  100k median: 2203.8x
