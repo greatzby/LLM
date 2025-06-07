@@ -1,0 +1,9 @@
+{
+  "checkpoint": "out/simple_graph_1_1_120_100/50000_ckpt_20.pt",
+  "num_nodes": 100,
+  "weight_gap": 0.4420433044433594,
+  "avg_edge_weight": 0.4708731174468994,
+  "avg_non_edge_weight": 0.028829799965023994,
+  "token_offset": 2,
+  "graph_type": "directed"
+}
