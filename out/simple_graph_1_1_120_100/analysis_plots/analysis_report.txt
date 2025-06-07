@@ -1,0 +1,111 @@
+================================================================================
+PREDICTION DISTRIBUTION ANALYSIS REPORT
+================================================================================
+
+1. OVERALL TRENDS
+----------------------------------------
+
+Checkpoint 7000:
+  Correct token prob: 0.8644
+  Effective choices: 1.45
+  Entropy: 0.1913
+  Successor/Non-successor ratio: 66764.91
+
+Checkpoint 8000:
+  Correct token prob: 0.8659
+  Effective choices: 1.42
+  Entropy: 0.1908
+  Successor/Non-successor ratio: 74435.75
+
+Checkpoint 9000:
+  Correct token prob: 0.8657
+  Effective choices: 1.45
+  Entropy: 0.1888
+  Successor/Non-successor ratio: 81685.43
+
+Checkpoint 10000:
+  Correct token prob: 0.8647
+  Effective choices: 1.52
+  Entropy: 0.2164
+  Successor/Non-successor ratio: 49272.42
+
+Checkpoint 15000:
+  Correct token prob: 0.8707
+  Effective choices: 1.45
+  Entropy: 0.1866
+  Successor/Non-successor ratio: 94691.14
+
+Checkpoint 20000:
+  Correct token prob: 0.8636
+  Effective choices: 1.47
+  Entropy: 0.2072
+  Successor/Non-successor ratio: 192887.77
+
+Checkpoint 30000:
+  Correct token prob: 0.8646
+  Effective choices: 1.42
+  Entropy: 0.1904
+  Successor/Non-successor ratio: 276919.33
+
+Checkpoint 40000:
+  Correct token prob: 0.8696
+  Effective choices: 1.41
+  Entropy: 0.1811
+  Successor/Non-successor ratio: 396142.50
+
+Checkpoint 50000:
+  Correct token prob: 0.8767
+  Effective choices: 1.41
+  Entropy: 0.1800
+  Successor/Non-successor ratio: 479836.90
+
+Checkpoint 60000:
+  Correct token prob: 0.8788
+  Effective choices: 1.40
+  Entropy: 0.1740
+  Successor/Non-successor ratio: 698523.29
+
+Checkpoint 70000:
+  Correct token prob: 0.8737
+  Effective choices: 1.40
+  Entropy: 0.1730
+  Successor/Non-successor ratio: 1085763.32
+
+Checkpoint 80000:
+  Correct token prob: 0.8765
+  Effective choices: 1.38
+  Entropy: 0.1678
+  Successor/Non-successor ratio: 1122299.04
+
+Checkpoint 90000:
+  Correct token prob: 0.8789
+  Effective choices: 1.36
+  Entropy: 0.1651
+  Successor/Non-successor ratio: 1401969.35
+
+Checkpoint 100000:
+  Correct token prob: 0.8782
+  Effective choices: 1.36
+  Entropy: 0.1581
+  Successor/Non-successor ratio: 1532778.08
+
+
+2. EXCLUSION VS SELECTION PHASE COMPARISON
+----------------------------------------
+
+Exclusion Phase (≤40k):
+  Avg correct_token_prob: 0.8662
+  Avg effective_choices: 1.4463
+  Avg entropy: 0.1941
+
+Selection Phase (>40k):
+  Avg correct_token_prob: 0.8771
+  Avg effective_choices: 1.3842
+  Avg entropy: 0.1697
+
+
+3. KEY FINDINGS
+----------------------------------------
+
+✗ No clear evidence of Exclusion to Selection transition:
+  Effective choices remained similar: 1.45 vs 1.38
