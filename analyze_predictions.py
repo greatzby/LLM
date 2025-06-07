@@ -1,6 +1,6 @@
 """
 analyze_predictions.py - 分析模型在不同训练阶段的预测分布变化
-修正版：考虑node ID到token ID的偏移
+重点关注Exclusion到Selection的转变
 """
 
 import os
@@ -56,6 +56,10 @@ def get_successors(node):
 
 def load_model(checkpoint_path):
     """加载模型checkpoint"""
+    if not os.path.exists(checkpoint_path):
+        print(f"Checkpoint not found: {checkpoint_path}")
+        return None
+    
     print(f"Loading checkpoint: {checkpoint_path}")
     checkpoint = torch.load(checkpoint_path, map_location=device)
     
@@ -86,7 +90,7 @@ def decode(l):
     return " ".join([itos[i] for i in l])
 
 def analyze_prediction_distribution(model, test_samples, num_samples=100):
-    """分析模型的预测分布特征（修正版）"""
+    """分析模型的预测分布特征（增强版）"""
     results = {
         'correct_token_prob': [],      
         'max_successor_prob': [],       
@@ -96,7 +100,12 @@ def analyze_prediction_distribution(model, test_samples, num_samples=100):
         'avg_non_successor_prob': [],   
         'entropy': [],                 
         'correct_successor_rank': [],   
-        'successor_vs_non_successor_ratio': []
+        'successor_vs_non_successor_ratio': [],
+        # 新增指标
+        'top5_concentration': [],      # top-5概率之和
+        'effective_choices': [],       # 概率>0.01的选项数
+        'other_successor_probs': [],  # 其他后继节点的概率列表
+        'distribution_smoothness': []  # 分布平滑度
     }
     
     analyzed = 0
@@ -162,6 +171,25 @@ def analyze_prediction_distribution(model, test_samples, num_samples=100):
                 ratio = successor_probs.mean() / (non_successor_probs.mean() + 1e-10)
                 results['successor_vs_non_successor_ratio'].append(ratio)
                 
+                # 新增统计
+                # Top-5概率集中度
+                top5_probs = sorted(node_probs)[-5:]
+                results['top5_concentration'].append(sum(top5_probs))
+                
+                # 有效选择数（概率>0.01）
+                effective = sum(1 for p in node_probs if p > 0.01)
+                results['effective_choices'].append(effective)
+                
+                # 其他后继节点的概率
+                other_successor_probs = [probs[node_to_token(s)] for s in successors if s != correct_next]
+                results['other_successor_probs'].extend(other_successor_probs)
+                
+                # 分布平滑度（使用基尼系数的反向）
+                sorted_probs = sorted(node_probs)
+                n = len(sorted_probs)
+                gini = sum((2*i - n + 1) * p for i, p in enumerate(sorted_probs)) / (n * sum(sorted_probs))
+                results['distribution_smoothness'].append(1 - gini)
+                
                 analyzed += 1
                 if analyzed >= num_samples:
                     break
@@ -172,71 +200,227 @@ def analyze_prediction_distribution(model, test_samples, num_samples=100):
     print(f"Analyzed {analyzed} predictions")
     return results
 
-def analyze_specific_examples(checkpoints, test_samples, num_examples=5):
-    """分析具体例子在不同checkpoint的预测变化（修正版）"""
-    selected_samples = test_samples[:num_examples]
+def visualize_probability_distributions(test_samples, checkpoints_to_compare):
+    """可视化同一个预测在不同checkpoint的概率分布"""
     
-    for sample_idx, (prompt, full_path) in enumerate(selected_samples):
-        print(f"\n{'='*80}")
-        print(f"Example {sample_idx + 1}")
-        print(f"Full path: {full_path}")
+    # 选择一个代表性的测试样本
+    selected_sample = None
+    for sample in test_samples[:50]:
+        path_nodes = re.findall(r'\d+', sample[1])
+        if len(path_nodes) >= 6:  # 确保路径足够长
+            selected_sample = sample
+            break
+    
+    if not selected_sample:
+        print("No suitable sample found")
+        return
+    
+    path_nodes = re.findall(r'\d+', selected_sample[1])
+    analyze_pos = 4  # 分析第4步
+    current_node = int(path_nodes[analyze_pos])
+    correct_next = int(path_nodes[analyze_pos + 1])
+    
+    successors = get_successors(current_node)
+    successors = [int(s) for s in successors]
+    
+    print(f"Analyzing: {current_node} -> {correct_next}")
+    print(f"Successors: {successors}")
+    
+    # 构建输入
+    input_seq = encode(" ".join(path_nodes[:analyze_pos+1]))
+    input_tensor = torch.tensor([input_seq], dtype=torch.long, device=device)
+    
+    fig, axes = plt.subplots(2, 4, figsize=(20, 10))
+    axes = axes.flatten()
+    
+    for idx, ckpt in enumerate(checkpoints_to_compare[:8]):
+        ckpt_path = os.path.join(out_dir, f'{ckpt}_ckpt_20.pt')
+        model = load_model(ckpt_path)
+        if model is None:
+            continue
         
-        # 解析路径
-        path_nodes = re.findall(r'\d+', full_path)
-        if len(path_nodes) < 4:
+        with torch.no_grad():
+            logits, _ = model(input_tensor)
+            probs = F.softmax(logits[0, -1, :], dim=-1).cpu().numpy()
+        
+        # 获取节点概率
+        node_probs = probs[NODE_OFFSET:NODE_OFFSET+num_nodes]
+        
+        # 准备数据
+        correct_prob = node_probs[correct_next]
+        other_successor_probs = [node_probs[s] for s in successors if s != correct_next]
+        non_successor_probs = [node_probs[i] for i in range(num_nodes) 
+                              if i not in successors and i != current_node]
+        
+        # 绘制
+        ax = axes[idx]
+        
+        # 绘制所有后继节点的概率
+        x_pos = 0
+        colors = []
+        heights = []
+        labels = []
+        
+        # 正确答案
+        heights.append(correct_prob)
+        colors.append('green')
+        labels.append(f'Correct ({correct_next})')
+        
+        # 其他后继
+        for i, (s, p) in enumerate(zip([s for s in successors if s != correct_next], other_successor_probs)):
+            heights.append(p)
+            colors.append('orange')
+            labels.append(f'Succ {s}')
+        
+        # 非后继平均
+        heights.append(np.mean(non_successor_probs))
+        colors.append('red')
+        labels.append('Non-succ\n(avg)')
+        
+        bars = ax.bar(range(len(heights)), heights, color=colors)
+        ax.set_xticks(range(len(labels)))
+        ax.set_xticklabels(labels, rotation=45, ha='right')
+        ax.set_ylim(0, 1.1)
+        ax.set_title(f'Checkpoint {ckpt//1000}k')
+        
+        # 添加统计信息
+        entropy = -sum(p * np.log(p + 1e-10) for p in node_probs if p > 0)
+        effective_choices = sum(1 for p in node_probs if p > 0.01)
+        ax.text(0.5, 0.95, f'Entropy: {entropy:.2f}', transform=ax.transAxes, ha='center')
+        ax.text(0.5, 0.90, f'Effective choices: {effective_choices}', transform=ax.transAxes, ha='center')
+    
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, 'distribution_evolution.png'), dpi=150)
+    plt.show()
+
+def analyze_distribution_characteristics(all_results, checkpoints):
+    """分析分布特征的演变"""
+    
+    metrics = {
+        'checkpoints': [],
+        'top1_concentration': [],
+        'top5_concentration': [],
+        'effective_choices': [],
+        'distribution_smoothness': [],
+        'exploration_score': [],
+        'avg_other_successor_prob': []
+    }
+    
+    for ckpt in checkpoints:
+        if ckpt not in all_results:
             continue
             
-        # 选择路径中间的一个预测点
-        analyze_pos = min(5, len(path_nodes) - 2)
-        current_node = int(path_nodes[analyze_pos])
-        correct_next = int(path_nodes[analyze_pos + 1])
+        results = all_results[ckpt]
+        metrics['checkpoints'].append(ckpt)
         
-        print(f"Analyzing step {analyze_pos}: {current_node} -> ?")
-        print(f"Correct next: {correct_next}")
+        # Top-1集中度（正确答案的概率）
+        metrics['top1_concentration'].append(np.mean(results['correct_token_prob']))
         
-        successors = get_successors(current_node)
-        successors = [int(s) for s in successors]
-        print(f"Successors of {current_node}: {successors}")
-        print(f"Is correct next a successor? {correct_next in successors}")
+        # Top-5集中度
+        metrics['top5_concentration'].append(np.mean(results['top5_concentration']))
         
-        # 构建输入
-        input_seq = encode(" ".join(path_nodes[:analyze_pos+1]))
-        input_tensor = torch.tensor([input_seq], dtype=torch.long, device=device)
+        # 有效选择数
+        metrics['effective_choices'].append(np.mean(results['effective_choices']))
         
-        # 对每个checkpoint分析
-        for ckpt in checkpoints:
-            ckpt_path = os.path.join(out_dir, f'{ckpt}_ckpt_20.pt')
-            if not os.path.exists(ckpt_path):
-                continue
-                
-            model = load_model(ckpt_path)
-            
-            with torch.no_grad():
-                logits, _ = model(input_tensor)
-                logits = logits[0, -1, :]
-                probs = F.softmax(logits, dim=-1).cpu().numpy()
-            
-            print(f"\n--- Checkpoint {ckpt} ---")
-            
-            # 显示top 10预测（转换回节点ID）
-            top_k_indices = probs.argsort()[-10:][::-1]
-            for rank, token_idx in enumerate(top_k_indices):
-                node_id = token_to_node(token_idx)
-                if node_id is None or node_id >= num_nodes:
-                    continue
-                is_successor = "✓" if node_id in successors else "✗"
-                is_correct = "★" if node_id == correct_next else " "
-                print(f"{rank+1}. {is_correct}{is_successor} Node {node_id}: {probs[token_idx]:.4f}")
-            
-            # 显示后继节点概率统计
-            successor_tokens = [node_to_token(n) for n in successors]
-            successor_probs = probs[successor_tokens]
-            print(f"\nSuccessor statistics:")
-            print(f"  Max: {successor_probs.max():.4f}, Min: {successor_probs.min():.4f}")
-            print(f"  Mean: {successor_probs.mean():.4f}, Std: {successor_probs.std():.4f}")
-            correct_token = node_to_token(correct_next)
-            print(f"  Correct token prob: {probs[correct_token]:.4f}")
-            print(f"  Correct token rank among successors: {sum(1 for p in successor_probs if p > probs[correct_token]) + 1}/{len(successors)}")
+        # 分布平滑度
+        metrics['distribution_smoothness'].append(np.mean(results['distribution_smoothness']))
+        
+        # 探索性分数（熵/最大可能熵）
+        avg_entropy = np.mean(results['entropy'])
+        max_possible_entropy = np.log(num_nodes)
+        metrics['exploration_score'].append(avg_entropy / max_possible_entropy)
+        
+        # 其他后继节点的平均概率
+        if results['other_successor_probs']:
+            metrics['avg_other_successor_prob'].append(np.mean(results['other_successor_probs']))
+        else:
+            metrics['avg_other_successor_prob'].append(0)
+    
+    return metrics
+
+def plot_distribution_metrics(metrics):
+    """绘制分布特征的演变图"""
+    
+    plt.figure(figsize=(16, 12))
+    checkpoints = metrics['checkpoints']
+    
+    # 1. 概率集中度
+    plt.subplot(3, 2, 1)
+    plt.plot(checkpoints, metrics['top1_concentration'], label='Top-1 (Correct)', marker='o', markersize=8)
+    plt.plot(checkpoints, metrics['top5_concentration'], label='Top-5 Sum', marker='s', markersize=8)
+    plt.axvline(x=40000, color='r', linestyle='--', alpha=0.5, label='Non-edge weights turn positive')
+    plt.xlabel('Training Steps')
+    plt.ylabel('Probability')
+    plt.title('Probability Concentration Over Training')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    
+    # 2. 有效选择数
+    plt.subplot(3, 2, 2)
+    plt.plot(checkpoints, metrics['effective_choices'], marker='o', markersize=8, color='purple')
+    plt.axvline(x=40000, color='r', linestyle='--', alpha=0.5)
+    plt.xlabel('Training Steps')
+    plt.ylabel('Number of Choices')
+    plt.title('Effective Choices (p > 0.01)')
+    plt.grid(True, alpha=0.3)
+    
+    # 3. 探索性分数
+    plt.subplot(3, 2, 3)
+    plt.plot(checkpoints, metrics['exploration_score'], marker='o', markersize=8, color='green')
+    plt.axvline(x=40000, color='r', linestyle='--', alpha=0.5)
+    plt.xlabel('Training Steps')
+    plt.ylabel('Exploration Score')
+    plt.title('Exploration Capability (Entropy/Max Entropy)')
+    plt.grid(True, alpha=0.3)
+    
+    # 4. 分布平滑度
+    plt.subplot(3, 2, 4)
+    plt.plot(checkpoints, metrics['distribution_smoothness'], marker='o', markersize=8, color='orange')
+    plt.axvline(x=40000, color='r', linestyle='--', alpha=0.5)
+    plt.xlabel('Training Steps')
+    plt.ylabel('Smoothness Score')
+    plt.title('Distribution Smoothness (1 - Gini)')
+    plt.grid(True, alpha=0.3)
+    
+    # 5. 其他后继节点的概率
+    plt.subplot(3, 2, 5)
+    plt.plot(checkpoints, metrics['avg_other_successor_prob'], marker='o', markersize=8, color='brown')
+    plt.axvline(x=40000, color='r', linestyle='--', alpha=0.5)
+    plt.xlabel('Training Steps')
+    plt.ylabel('Average Probability')
+    plt.title('Average Probability of Other Successors')
+    plt.yscale('log')
+    plt.grid(True, alpha=0.3)
+    
+    # 6. Exclusion vs Selection对比
+    plt.subplot(3, 2, 6)
+    exclusion_phase = [i for i, c in enumerate(checkpoints) if c <= 40000]
+    selection_phase = [i for i, c in enumerate(checkpoints) if c > 40000]
+    
+    if exclusion_phase and selection_phase:
+        exclusion_entropy = np.mean([metrics['exploration_score'][i] for i in exclusion_phase])
+        selection_entropy = np.mean([metrics['exploration_score'][i] for i in selection_phase])
+        
+        exclusion_choices = np.mean([metrics['effective_choices'][i] for i in exclusion_phase])
+        selection_choices = np.mean([metrics['effective_choices'][i] for i in selection_phase])
+        
+        x = ['Exclusion\n(≤40k)', 'Selection\n(>40k)']
+        y1 = [exclusion_entropy, selection_entropy]
+        y2 = [exclusion_choices/10, selection_choices/10]  # 缩放以便在同一图中显示
+        
+        x_pos = np.arange(len(x))
+        width = 0.35
+        
+        plt.bar(x_pos - width/2, y1, width, label='Exploration Score', color='green', alpha=0.7)
+        plt.bar(x_pos + width/2, y2, width, label='Effective Choices/10', color='purple', alpha=0.7)
+        plt.xticks(x_pos, x)
+        plt.ylabel('Score')
+        plt.title('Exclusion vs Selection Phase Comparison')
+        plt.legend()
+    
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, 'distribution_metrics_evolution.png'), dpi=150)
+    plt.show()
 
 def load_test_samples():
     """加载测试样本"""
@@ -248,14 +432,14 @@ def load_test_samples():
             line = line.strip()
             if not line:
                 continue
-            # 格式：source target path...
-            samples.append(("", line))  # 不需要特别的prompt
+            samples.append(("", line))
     
     return samples
 
 def main():
-    # 要分析的checkpoint
-    checkpoints = [7000, 8000, 9000, 10000, 15000, 20000, 30000, 40000, 50000]
+    # 扩展要分析的checkpoint范围
+    checkpoints = [7000, 8000, 9000, 10000, 15000, 20000, 30000, 40000, 
+                   50000, 60000, 70000, 80000, 90000, 100000]
     
     # 加载测试样本
     print("Loading test samples...")
@@ -271,6 +455,9 @@ def main():
             continue
             
         model = load_model(ckpt_path)
+        if model is None:
+            continue
+            
         print(f"\nAnalyzing checkpoint {ckpt}...")
         results = analyze_prediction_distribution(model, test_samples, num_samples=200)
         all_results[ckpt] = results
@@ -282,95 +469,61 @@ def main():
         print(f"  Avg successor/non-successor ratio: {np.mean(results['successor_vs_non_successor_ratio']):.2f}")
         print(f"  Avg entropy: {np.mean(results['entropy']):.4f}")
         print(f"  Avg correct token rank: {np.mean(results['correct_successor_rank']):.2f}")
+        print(f"  Avg effective choices: {np.mean(results['effective_choices']):.2f}")
+        print(f"  Top-5 concentration: {np.mean(results['top5_concentration']):.4f}")
     
-    # 2. 绘制关键指标随训练步数的变化
-    plt.figure(figsize=(15, 10))
-    
-    # 准备数据
-    ckpt_list = sorted([c for c in checkpoints if c in all_results])
-    
-    # 2.1 正确答案的概率
-    plt.subplot(2, 3, 1)
-    values = [np.mean(all_results[c]['correct_token_prob']) for c in ckpt_list]
-    plt.plot(ckpt_list, values, marker='o')
-    plt.axvline(x=8000, color='r', linestyle='--', alpha=0.5, label='TF accuracy drop')
-    plt.xlabel('Iteration')
-    plt.ylabel('Probability')
-    plt.title('Average Probability of Correct Token')
-    plt.legend()
-    
-    # 2.2 后继节点间概率的标准差
-    plt.subplot(2, 3, 2)
-    values = [np.mean(all_results[c]['successor_prob_std']) for c in ckpt_list]
-    plt.plot(ckpt_list, values, marker='o')
-    plt.axvline(x=8000, color='r', linestyle='--', alpha=0.5)
-    plt.xlabel('Iteration')
-    plt.ylabel('Std Dev')
-    plt.title('Std of Successor Probabilities\n(Lower = more uniform)')
-    
-    # 2.3 后继vs非后继的概率比
-    plt.subplot(2, 3, 3)
-    values = [np.mean(all_results[c]['successor_vs_non_successor_ratio']) for c in ckpt_list]
-    plt.plot(ckpt_list, values, marker='o')
-    plt.axvline(x=8000, color='r', linestyle='--', alpha=0.5)
-    plt.xlabel('Iteration')
-    plt.ylabel('Ratio')
-    plt.title('Successor/Non-successor Probability Ratio')
-    plt.yscale('log')
-    
-    # 2.4 预测分布的熵
-    plt.subplot(2, 3, 4)
-    values = [np.mean(all_results[c]['entropy']) for c in ckpt_list]
-    plt.plot(ckpt_list, values, marker='o')
-    plt.axvline(x=8000, color='r', linestyle='--', alpha=0.5)
-    plt.xlabel('Iteration')
-    plt.ylabel('Entropy')
-    plt.title('Prediction Entropy')
-    
-    # 2.5 正确答案的平均排名
-    plt.subplot(2, 3, 5)
-    values = [np.mean(all_results[c]['correct_successor_rank']) for c in ckpt_list]
-    plt.plot(ckpt_list, values, marker='o')
-    plt.axvline(x=8000, color='r', linestyle='--', alpha=0.5)
-    plt.xlabel('Iteration')
-    plt.ylabel('Average Rank')
-    plt.title('Average Rank of Correct Token\n(among successors)')
-    
-    # 2.6 后继节点的平均概率
-    plt.subplot(2, 3, 6)
-    values = [np.mean(all_results[c]['avg_successor_prob']) for c in ckpt_list]
-    plt.plot(ckpt_list, values, marker='o')
-    plt.axvline(x=8000, color='r', linestyle='--', alpha=0.5)
-    plt.xlabel('Iteration')
-    plt.ylabel('Average Probability')
-    plt.title('Average Probability of Successor Nodes')
-    
-    plt.tight_layout()
-    plt.savefig(os.path.join(out_dir, 'prediction_distribution_analysis_fixed.png'), dpi=150)
-    plt.show()
-    
-    # 3. 分析具体例子
+    # 2. 分析分布特征
     print("\n" + "="*80)
-    print("SPECIFIC EXAMPLE ANALYSIS")
-    print("="*80)
-    analyze_specific_examples([7000, 8000, 9000, 10000, 20000, 40000], test_samples, num_examples=3)
-    
-    # 4. 特别分析8k-10k的变化
-    print("\n" + "="*80)
-    print("SPECIAL ANALYSIS: 8k-10k transition")
+    print("ANALYZING DISTRIBUTION CHARACTERISTICS")
     print("="*80)
     
-    if 8000 in all_results and 10000 in all_results:
-        print("\nComparing 8k vs 10k:")
-        print(f"Correct token prob: {np.mean(all_results[8000]['correct_token_prob']):.4f} -> {np.mean(all_results[10000]['correct_token_prob']):.4f}")
-        print(f"Successor prob std: {np.mean(all_results[8000]['successor_prob_std']):.4f} -> {np.mean(all_results[10000]['successor_prob_std']):.4f}")
-        print(f"Successor/non-successor ratio: {np.mean(all_results[8000]['successor_vs_non_successor_ratio']):.2f} -> {np.mean(all_results[10000]['successor_vs_non_successor_ratio']):.2f}")
+    metrics = analyze_distribution_characteristics(all_results, checkpoints)
+    plot_distribution_metrics(metrics)
+    
+    # 3. 可视化具体的概率分布演变
+    print("\n" + "="*80)
+    print("VISUALIZING PROBABILITY DISTRIBUTIONS")
+    print("="*80)
+    
+    visualize_probability_distributions(test_samples, 
+                                      [10000, 20000, 30000, 40000, 50000, 70000, 90000, 100000])
+    
+    # 4. 特别分析Exclusion到Selection的转变
+    print("\n" + "="*80)
+    print("EXCLUSION TO SELECTION TRANSITION ANALYSIS")
+    print("="*80)
+    
+    # 找出转变前后的代表性checkpoint
+    exclusion_checkpoints = [c for c in checkpoints if c <= 40000 and c in all_results]
+    selection_checkpoints = [c for c in checkpoints if c > 40000 and c in all_results]
+    
+    if exclusion_checkpoints and selection_checkpoints:
+        # 对比平均指标
+        print("\nExclusion Phase (≤40k) Average Metrics:")
+        for metric in ['correct_token_prob', 'effective_choices', 'entropy']:
+            avg_value = np.mean([np.mean(all_results[c][metric]) for c in exclusion_checkpoints])
+            print(f"  {metric}: {avg_value:.4f}")
         
-        # 检查后继节点概率是否变得更均匀
-        std_8k = np.mean(all_results[8000]['successor_prob_std'])
-        std_10k = np.mean(all_results[10000]['successor_prob_std'])
-        if std_10k < std_8k * 0.5:
-            print("\n⚠️ 后继节点间概率标准差大幅下降，表明模型失去了区分不同后继节点的能力！")
+        print("\nSelection Phase (>40k) Average Metrics:")
+        for metric in ['correct_token_prob', 'effective_choices', 'entropy']:
+            avg_value = np.mean([np.mean(all_results[c][metric]) for c in selection_checkpoints])
+            print(f"  {metric}: {avg_value:.4f}")
+        
+        # 分析其他后继节点的概率变化
+        print("\nOther Successor Nodes Probability Analysis:")
+        for phase, phase_checkpoints in [("Exclusion", exclusion_checkpoints[-2:]), 
+                                        ("Selection", selection_checkpoints[:2])]:
+            other_probs = []
+            for c in phase_checkpoints:
+                if c in all_results and all_results[c]['other_successor_probs']:
+                    other_probs.extend(all_results[c]['other_successor_probs'])
+            
+            if other_probs:
+                print(f"{phase} phase - Other successors:")
+                print(f"  Mean: {np.mean(other_probs):.6f}")
+                print(f"  Median: {np.median(other_probs):.6f}")
+                print(f"  % > 0.01: {sum(p > 0.01 for p in other_probs) / len(other_probs) * 100:.1f}%")
+                print(f"  % > 0.001: {sum(p > 0.001 for p in other_probs) / len(other_probs) * 100:.1f}%")
 
 if __name__ == "__main__":
     main()
