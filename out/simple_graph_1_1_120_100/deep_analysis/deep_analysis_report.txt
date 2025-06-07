@@ -3,92 +3,307 @@ DEEP ANALYSIS REPORT: LOGIT DISTRIBUTIONS AND SOFTMAX EFFECTS
 ================================================================================
 
 
+Checkpoint 1000:
+----------------------------------------
+LOGIT STATISTICS:
+  Number of samples: 300
+  Edge logits: mean=3.3751, std=3.5792, min=-2.6704, max=12.9585
+  Non-edge logits: mean=-0.4427, std=1.5064, min=-5.2304, max=7.5603
+  Logit gap (edge - non-edge): 3.8177
+  Correct answer logits: mean=10.7730, std=1.4172
+  Other successor logits: mean=2.4362, std=2.5209
+
+SOFTMAX AMPLIFICATION:
+  Median amplification: 137.9x
+  Mean amplification: 431.9x
+  90th percentile: 1481.0x
+  99th percentile: 3045.2x
+
+SIMPLIFIED PROBABILITY ESTIMATION:
+  If we had only 2 choices with gap=3.8177:
+    Edge probability ≈ 0.978495
+    Non-edge probability ≈ 0.021505
+    Ratio ≈ 45.5x
+
+Checkpoint 7000:
+----------------------------------------
+LOGIT STATISTICS:
+  Number of samples: 300
+  Edge logits: mean=4.6055, std=4.5771, min=-4.7286, max=17.4082
+  Non-edge logits: mean=-0.4877, std=2.2073, min=-8.8801, max=9.4131
+  Logit gap (edge - non-edge): 5.0932
+  Correct answer logits: mean=14.0902, std=1.5798
+  Other successor logits: mean=3.4018, std=3.2291
+
+SOFTMAX AMPLIFICATION:
+  Median amplification: 697.9x
+  Mean amplification: 3020.9x
+  90th percentile: 7949.4x
+  99th percentile: 38857.0x
+
+SIMPLIFIED PROBABILITY ESTIMATION:
+  If we had only 2 choices with gap=5.0932:
+    Edge probability ≈ 0.993899
+    Non-edge probability ≈ 0.006101
+    Ratio ≈ 162.9x
+
+Checkpoint 8000:
+----------------------------------------
+LOGIT STATISTICS:
+  Number of samples: 300
+  Edge logits: mean=4.6347, std=4.6028, min=-4.5301, max=17.4591
+  Non-edge logits: mean=-0.4948, std=2.2178, min=-8.9980, max=9.8208
+  Logit gap (edge - non-edge): 5.1295
+  Correct answer logits: mean=14.1675, std=1.5683
+  Other successor logits: mean=3.4250, std=3.2506
+
+SOFTMAX AMPLIFICATION:
+  Median amplification: 744.1x
+  Mean amplification: 3006.4x
+  90th percentile: 8031.8x
+  99th percentile: 29173.2x
+
+SIMPLIFIED PROBABILITY ESTIMATION:
+  If we had only 2 choices with gap=5.1295:
+    Edge probability ≈ 0.994115
+    Non-edge probability ≈ 0.005885
+    Ratio ≈ 168.9x
+
+Checkpoint 10000:
+----------------------------------------
+LOGIT STATISTICS:
+  Number of samples: 300
+  Edge logits: mean=4.8481, std=4.3807, min=-4.9119, max=17.1553
+  Non-edge logits: mean=-0.4902, std=2.2428, min=-8.6655, max=10.6954
+  Logit gap (edge - non-edge): 5.3383
+  Correct answer logits: mean=13.7559, std=1.5451
+  Other successor logits: mean=3.7177, std=3.1583
+
+SOFTMAX AMPLIFICATION:
+  Median amplification: 368.3x
+  Mean amplification: 2475.4x
+  90th percentile: 6200.8x
+  99th percentile: 34143.3x
+
+SIMPLIFIED PROBABILITY ESTIMATION:
+  If we had only 2 choices with gap=5.3383:
+    Edge probability ≈ 0.995219
+    Non-edge probability ≈ 0.004781
+    Ratio ≈ 208.2x
+
+Checkpoint 20000:
+----------------------------------------
+LOGIT STATISTICS:
+  Number of samples: 300
+  Edge logits: mean=5.3181, std=4.9862, min=-6.1479, max=19.3089
+  Non-edge logits: mean=-0.4287, std=2.7505, min=-9.6251, max=10.9487
+  Logit gap (edge - non-edge): 5.7468
+  Correct answer logits: mean=15.3172, std=1.7207
+  Other successor logits: mean=4.0492, std=3.6529
+
+SOFTMAX AMPLIFICATION:
+  Median amplification: 546.4x
+  Mean amplification: 6913.5x
+  90th percentile: 11969.1x
+  99th percentile: 109057.3x
+
+SIMPLIFIED PROBABILITY ESTIMATION:
+  If we had only 2 choices with gap=5.7468:
+    Edge probability ≈ 0.996817
+    Non-edge probability ≈ 0.003183
+    Ratio ≈ 313.2x
+
+Checkpoint 30000:
+----------------------------------------
+LOGIT STATISTICS:
+  Number of samples: 300
+  Edge logits: mean=5.5040, std=5.1502, min=-6.6341, max=20.3195
+  Non-edge logits: mean=-0.4529, std=2.9305, min=-10.5330, max=11.6038
+  Logit gap (edge - non-edge): 5.9570
+  Correct answer logits: mean=15.9275, std=1.8719
+  Other successor logits: mean=4.1812, std=3.7294
+
+SOFTMAX AMPLIFICATION:
+  Median amplification: 875.0x
+  Mean amplification: 11186.3x
+  90th percentile: 13864.5x
+  99th percentile: 156076.7x
+
+SIMPLIFIED PROBABILITY ESTIMATION:
+  If we had only 2 choices with gap=5.9570:
+    Edge probability ≈ 0.997419
+    Non-edge probability ≈ 0.002581
+    Ratio ≈ 386.4x
+
 Checkpoint 40000:
 ----------------------------------------
 LOGIT STATISTICS:
-  Edge logits: mean=5.6125, std=5.3198
-  Non-edge logits: mean=-0.5162, std=3.0580
-  Logit gap (edge - non-edge): 6.1287
-  Correct answer logits: mean=16.4028
-  Other successor logits: mean=4.2426
+  Number of samples: 300
+  Edge logits: mean=5.6120, std=5.3074, min=-7.3430, max=21.2499
+  Non-edge logits: mean=-0.5218, std=3.0593, min=-11.7186, max=11.9676
+  Logit gap (edge - non-edge): 6.1338
+  Correct answer logits: mean=16.3717, std=1.9935
+  Other successor logits: mean=4.2465, std=3.8318
 
 SOFTMAX AMPLIFICATION:
-  Median amplification: 907.0x
-  Mean amplification: 18366.4x
-  Max amplification: 975173.5x
+  Median amplification: 905.6x
+  Mean amplification: 17121.3x
+  90th percentile: 30873.5x
+  99th percentile: 355300.4x
 
-AFTER SOFTMAX:
-  Approx edge prob: 0.890871
-  Approx non-edge prob: 0.046601
-  Probability ratio: 19.1x
+SIMPLIFIED PROBABILITY ESTIMATION:
+  If we had only 2 choices with gap=6.1338:
+    Edge probability ≈ 0.997836
+    Non-edge probability ≈ 0.002164
+    Ratio ≈ 461.2x
 
 Checkpoint 50000:
 ----------------------------------------
 LOGIT STATISTICS:
-  Edge logits: mean=5.8009, std=5.4276
-  Non-edge logits: mean=-0.5445, std=3.1270
-  Logit gap (edge - non-edge): 6.3454
-  Correct answer logits: mean=16.7502
-  Other successor logits: mean=4.4108
+  Number of samples: 300
+  Edge logits: mean=5.8012, std=5.4157, min=-7.1788, max=21.5829
+  Non-edge logits: mean=-0.5516, std=3.1283, min=-12.1709, max=11.8046
+  Logit gap (edge - non-edge): 6.3528
+  Correct answer logits: mean=16.7241, std=1.9985
+  Other successor logits: mean=4.4150, std=3.9348
 
 SOFTMAX AMPLIFICATION:
-  Median amplification: 1132.4x
-  Mean amplification: 18416.0x
-  Max amplification: 1130527.2x
+  Median amplification: 1118.8x
+  Mean amplification: 16954.6x
+  90th percentile: 24778.4x
+  99th percentile: 359332.0x
 
-AFTER SOFTMAX:
-  Approx edge prob: 0.894368
-  Approx non-edge prob: 0.043870
-  Probability ratio: 20.4x
+SIMPLIFIED PROBABILITY ESTIMATION:
+  If we had only 2 choices with gap=6.3528:
+    Edge probability ≈ 0.998261
+    Non-edge probability ≈ 0.001739
+    Ratio ≈ 574.1x
+
+Checkpoint 60000:
+----------------------------------------
+LOGIT STATISTICS:
+  Number of samples: 300
+  Edge logits: mean=5.7926, std=5.4698, min=-8.5322, max=22.3333
+  Non-edge logits: mean=-0.6166, std=3.1906, min=-12.4463, max=12.3915
+  Logit gap (edge - non-edge): 6.4091
+  Correct answer logits: mean=16.9098, std=2.0615
+  Other successor logits: mean=4.3817, std=3.9372
+
+SOFTMAX AMPLIFICATION:
+  Median amplification: 1137.7x
+  Mean amplification: 31678.4x
+  90th percentile: 33460.7x
+  99th percentile: 981780.2x
+
+SIMPLIFIED PROBABILITY ESTIMATION:
+  If we had only 2 choices with gap=6.4091:
+    Edge probability ≈ 0.998356
+    Non-edge probability ≈ 0.001644
+    Ratio ≈ 607.4x
 
 Checkpoint 70000:
 ----------------------------------------
 LOGIT STATISTICS:
-  Edge logits: mean=5.8051, std=5.5549
-  Non-edge logits: mean=-0.6354, std=3.2244
-  Logit gap (edge - non-edge): 6.4405
-  Correct answer logits: mean=17.1252
-  Other successor logits: mean=4.3680
+  Number of samples: 300
+  Edge logits: mean=5.8048, std=5.5433, min=-8.2800, max=23.0411
+  Non-edge logits: mean=-0.6444, std=3.2256, min=-12.8348, max=12.6154
+  Logit gap (edge - non-edge): 6.4492
+  Correct answer logits: mean=17.0982, std=2.1352
+  Other successor logits: mean=4.3716, std=3.9762
 
 SOFTMAX AMPLIFICATION:
-  Median amplification: 1870.8x
-  Mean amplification: 54341.6x
-  Max amplification: 6646160.1x
+  Median amplification: 1802.7x
+  Mean amplification: 34956.8x
+  90th percentile: 52084.1x
+  99th percentile: 726545.3x
 
-AFTER SOFTMAX:
-  Approx edge prob: 0.897833
-  Approx non-edge prob: 0.044692
-  Probability ratio: 20.1x
+SIMPLIFIED PROBABILITY ESTIMATION:
+  If we had only 2 choices with gap=6.4492:
+    Edge probability ≈ 0.998421
+    Non-edge probability ≈ 0.001579
+    Ratio ≈ 632.2x
+
+Checkpoint 80000:
+----------------------------------------
+LOGIT STATISTICS:
+  Number of samples: 300
+  Edge logits: mean=5.8590, std=5.5885, min=-8.9563, max=22.9419
+  Non-edge logits: mean=-0.6615, std=3.2376, min=-12.8249, max=12.8998
+  Logit gap (edge - non-edge): 6.5205
+  Correct answer logits: mean=17.2402, std=2.1115
+  Other successor logits: mean=4.4146, std=4.0130
+
+SOFTMAX AMPLIFICATION:
+  Median amplification: 1807.3x
+  Mean amplification: 37572.3x
+  90th percentile: 63662.3x
+  99th percentile: 968547.3x
+
+SIMPLIFIED PROBABILITY ESTIMATION:
+  If we had only 2 choices with gap=6.5205:
+    Edge probability ≈ 0.998529
+    Non-edge probability ≈ 0.001471
+    Ratio ≈ 678.9x
+
+Checkpoint 90000:
+----------------------------------------
+LOGIT STATISTICS:
+  Number of samples: 300
+  Edge logits: mean=5.8754, std=5.6615, min=-9.5539, max=22.7704
+  Non-edge logits: mean=-0.6323, std=3.2564, min=-12.9068, max=13.1331
+  Logit gap (edge - non-edge): 6.5077
+  Correct answer logits: mean=17.4250, std=2.1664
+  Other successor logits: mean=4.4097, std=4.0556
+
+SOFTMAX AMPLIFICATION:
+  Median amplification: 2237.7x
+  Mean amplification: 38346.6x
+  90th percentile: 68434.3x
+  99th percentile: 877692.9x
+
+SIMPLIFIED PROBABILITY ESTIMATION:
+  If we had only 2 choices with gap=6.5077:
+    Edge probability ≈ 0.998510
+    Non-edge probability ≈ 0.001490
+    Ratio ≈ 670.3x
 
 Checkpoint 100000:
 ----------------------------------------
 LOGIT STATISTICS:
-  Edge logits: mean=5.9004, std=5.7124
-  Non-edge logits: mean=-0.6387, std=3.2434
-  Logit gap (edge - non-edge): 6.5391
-  Correct answer logits: mean=17.5373
-  Other successor logits: mean=4.4230
+  Number of samples: 300
+  Edge logits: mean=5.9006, std=5.7042, min=-9.6706, max=22.9384
+  Non-edge logits: mean=-0.6488, std=3.2444, min=-12.9725, max=12.8721
+  Logit gap (edge - non-edge): 6.5494
+  Correct answer logits: mean=17.5209, std=2.1562
+  Other successor logits: mean=4.4259, std=4.0947
 
 SOFTMAX AMPLIFICATION:
-  Median amplification: 2203.8x
-  Mean amplification: 58631.2x
-  Max amplification: 2954804.5x
+  Median amplification: 2119.9x
+  Mean amplification: 44082.1x
+  90th percentile: 87164.7x
+  99th percentile: 1000000.0x
 
-AFTER SOFTMAX:
-  Approx edge prob: 0.895014
-  Approx non-edge prob: 0.042077
-  Probability ratio: 21.3x
+SIMPLIFIED PROBABILITY ESTIMATION:
+  If we had only 2 choices with gap=6.5494:
+    Edge probability ≈ 0.998571
+    Non-edge probability ≈ 0.001429
+    Ratio ≈ 698.8x
 
 
 ================================================================================
 KEY FINDINGS:
 ================================================================================
 
-Logit gap change from 40k to 100k:
-  40k: 6.1287
-  100k: 6.5391
-  Change: 0.4104 (6.7%)
+Logit gap change from 1000 to 100000:
+  1000: 3.8177
+  100000: 6.5494
+  Change: 2.7317 (+71.6%)
 
 Softmax amplification change:
-  40k median: 907.0x
-  100k median: 2203.8x
+  1000 median: 137.9x
+  100000 median: 2119.9x
+
+IMPACT OF WEIGHT CHANGES:
+  Despite non-edge weights becoming positive after 40k,
+  the logit gap decreased by only 71.6%
+  This explains why the probability distribution remains highly concentrated.
