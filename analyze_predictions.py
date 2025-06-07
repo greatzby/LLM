@@ -1,6 +1,7 @@
 """
 analyze_predictions.py - 分析模型在不同训练阶段的预测分布变化
 重点关注Exclusion到Selection的转变
+所有图像都会保存到输出目录
 """
 
 import os
@@ -14,6 +15,9 @@ import networkx as nx
 import re
 from collections import defaultdict
 
+# 设置matplotlib不显示图形（只保存）
+plt.ioff()
+
 # 设置参数
 dataset = 'simple_graph'
 num_nodes = 100
@@ -25,6 +29,10 @@ device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 # 路径设置
 data_dir = f'data/{dataset}/{num_nodes}'
 out_dir = f'out/{dataset}_{n_layer}_{n_head}_{n_embd}_{num_nodes}'
+
+# 创建图像保存目录
+img_dir = os.path.join(out_dir, 'analysis_plots')
+os.makedirs(img_dir, exist_ok=True)
 
 # 加载meta信息
 with open(os.path.join(data_dir, 'meta.pkl'), 'rb') as f:
@@ -290,58 +298,15 @@ def visualize_probability_distributions(test_samples, checkpoints_to_compare):
         ax.text(0.5, 0.90, f'Effective choices: {effective_choices}', transform=ax.transAxes, ha='center')
     
     plt.tight_layout()
-    plt.savefig(os.path.join(out_dir, 'distribution_evolution.png'), dpi=150)
-    plt.show()
-
-def analyze_distribution_characteristics(all_results, checkpoints):
-    """分析分布特征的演变"""
-    
-    metrics = {
-        'checkpoints': [],
-        'top1_concentration': [],
-        'top5_concentration': [],
-        'effective_choices': [],
-        'distribution_smoothness': [],
-        'exploration_score': [],
-        'avg_other_successor_prob': []
-    }
-    
-    for ckpt in checkpoints:
-        if ckpt not in all_results:
-            continue
-            
-        results = all_results[ckpt]
-        metrics['checkpoints'].append(ckpt)
-        
-        # Top-1集中度（正确答案的概率）
-        metrics['top1_concentration'].append(np.mean(results['correct_token_prob']))
-        
-        # Top-5集中度
-        metrics['top5_concentration'].append(np.mean(results['top5_concentration']))
-        
-        # 有效选择数
-        metrics['effective_choices'].append(np.mean(results['effective_choices']))
-        
-        # 分布平滑度
-        metrics['distribution_smoothness'].append(np.mean(results['distribution_smoothness']))
-        
-        # 探索性分数（熵/最大可能熵）
-        avg_entropy = np.mean(results['entropy'])
-        max_possible_entropy = np.log(num_nodes)
-        metrics['exploration_score'].append(avg_entropy / max_possible_entropy)
-        
-        # 其他后继节点的平均概率
-        if results['other_successor_probs']:
-            metrics['avg_other_successor_prob'].append(np.mean(results['other_successor_probs']))
-        else:
-            metrics['avg_other_successor_prob'].append(0)
-    
-    return metrics
+    save_path = os.path.join(img_dir, 'distribution_evolution.png')
+    plt.savefig(save_path, dpi=150)
+    print(f"Saved: {save_path}")
+    plt.close()
 
 def plot_distribution_metrics(metrics):
     """绘制分布特征的演变图"""
     
-    plt.figure(figsize=(16, 12))
+    fig = plt.figure(figsize=(16, 12))
     checkpoints = metrics['checkpoints']
     
     # 1. 概率集中度
@@ -419,8 +384,137 @@ def plot_distribution_metrics(metrics):
         plt.legend()
     
     plt.tight_layout()
-    plt.savefig(os.path.join(out_dir, 'distribution_metrics_evolution.png'), dpi=150)
-    plt.show()
+    save_path = os.path.join(img_dir, 'distribution_metrics_evolution.png')
+    plt.savefig(save_path, dpi=150)
+    print(f"Saved: {save_path}")
+    plt.close()
+
+def plot_key_metrics_summary(all_results, checkpoints):
+    """绘制关键指标的总结图"""
+    
+    fig = plt.figure(figsize=(15, 10))
+    
+    # 准备数据
+    ckpt_list = sorted([c for c in checkpoints if c in all_results])
+    
+    # 1. 正确答案的概率
+    plt.subplot(2, 3, 1)
+    values = [np.mean(all_results[c]['correct_token_prob']) for c in ckpt_list]
+    plt.plot(ckpt_list, values, marker='o')
+    plt.axvline(x=8000, color='r', linestyle='--', alpha=0.5, label='TF accuracy drop')
+    plt.axvline(x=40000, color='g', linestyle='--', alpha=0.5, label='Weights turn positive')
+    plt.xlabel('Iteration')
+    plt.ylabel('Probability')
+    plt.title('Average Probability of Correct Token')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    
+    # 2. 后继节点间概率的标准差
+    plt.subplot(2, 3, 2)
+    values = [np.mean(all_results[c]['successor_prob_std']) for c in ckpt_list]
+    plt.plot(ckpt_list, values, marker='o')
+    plt.axvline(x=8000, color='r', linestyle='--', alpha=0.5)
+    plt.axvline(x=40000, color='g', linestyle='--', alpha=0.5)
+    plt.xlabel('Iteration')
+    plt.ylabel('Std Dev')
+    plt.title('Std of Successor Probabilities\n(Lower = more uniform)')
+    plt.grid(True, alpha=0.3)
+    
+    # 3. 后继vs非后继的概率比
+    plt.subplot(2, 3, 3)
+    values = [np.mean(all_results[c]['successor_vs_non_successor_ratio']) for c in ckpt_list]
+    plt.plot(ckpt_list, values, marker='o')
+    plt.axvline(x=8000, color='r', linestyle='--', alpha=0.5)
+    plt.axvline(x=40000, color='g', linestyle='--', alpha=0.5)
+    plt.xlabel('Iteration')
+    plt.ylabel('Ratio')
+    plt.title('Successor/Non-successor Probability Ratio')
+    plt.yscale('log')
+    plt.grid(True, alpha=0.3)
+    
+    # 4. 预测分布的熵
+    plt.subplot(2, 3, 4)
+    values = [np.mean(all_results[c]['entropy']) for c in ckpt_list]
+    plt.plot(ckpt_list, values, marker='o')
+    plt.axvline(x=8000, color='r', linestyle='--', alpha=0.5)
+    plt.axvline(x=40000, color='g', linestyle='--', alpha=0.5)
+    plt.xlabel('Iteration')
+    plt.ylabel('Entropy')
+    plt.title('Prediction Entropy')
+    plt.grid(True, alpha=0.3)
+    
+    # 5. 正确答案的平均排名
+    plt.subplot(2, 3, 5)
+    values = [np.mean(all_results[c]['correct_successor_rank']) for c in ckpt_list]
+    plt.plot(ckpt_list, values, marker='o')
+    plt.axvline(x=8000, color='r', linestyle='--', alpha=0.5)
+    plt.axvline(x=40000, color='g', linestyle='--', alpha=0.5)
+    plt.xlabel('Iteration')
+    plt.ylabel('Average Rank')
+    plt.title('Average Rank of Correct Token\n(among successors)')
+    plt.grid(True, alpha=0.3)
+    
+    # 6. 有效选择数
+    plt.subplot(2, 3, 6)
+    values = [np.mean(all_results[c]['effective_choices']) for c in ckpt_list]
+    plt.plot(ckpt_list, values, marker='o')
+    plt.axvline(x=8000, color='r', linestyle='--', alpha=0.5)
+    plt.axvline(x=40000, color='g', linestyle='--', alpha=0.5)
+    plt.xlabel('Iteration')
+    plt.ylabel('Number of Choices')
+    plt.title('Effective Choices (p > 0.01)')
+    plt.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    save_path = os.path.join(img_dir, 'key_metrics_summary.png')
+    plt.savefig(save_path, dpi=150)
+    print(f"Saved: {save_path}")
+    plt.close()
+
+def analyze_distribution_characteristics(all_results, checkpoints):
+    """分析分布特征的演变"""
+    
+    metrics = {
+        'checkpoints': [],
+        'top1_concentration': [],
+        'top5_concentration': [],
+        'effective_choices': [],
+        'distribution_smoothness': [],
+        'exploration_score': [],
+        'avg_other_successor_prob': []
+    }
+    
+    for ckpt in checkpoints:
+        if ckpt not in all_results:
+            continue
+            
+        results = all_results[ckpt]
+        metrics['checkpoints'].append(ckpt)
+        
+        # Top-1集中度（正确答案的概率）
+        metrics['top1_concentration'].append(np.mean(results['correct_token_prob']))
+        
+        # Top-5集中度
+        metrics['top5_concentration'].append(np.mean(results['top5_concentration']))
+        
+        # 有效选择数
+        metrics['effective_choices'].append(np.mean(results['effective_choices']))
+        
+        # 分布平滑度
+        metrics['distribution_smoothness'].append(np.mean(results['distribution_smoothness']))
+        
+        # 探索性分数（熵/最大可能熵）
+        avg_entropy = np.mean(results['entropy'])
+        max_possible_entropy = np.log(num_nodes)
+        metrics['exploration_score'].append(avg_entropy / max_possible_entropy)
+        
+        # 其他后继节点的平均概率
+        if results['other_successor_probs']:
+            metrics['avg_other_successor_prob'].append(np.mean(results['other_successor_probs']))
+        else:
+            metrics['avg_other_successor_prob'].append(0)
+    
+    return metrics
 
 def load_test_samples():
     """加载测试样本"""
@@ -435,6 +529,65 @@ def load_test_samples():
             samples.append(("", line))
     
     return samples
+
+def save_summary_report(all_results, metrics, checkpoints):
+    """保存文本格式的分析报告"""
+    
+    report_path = os.path.join(img_dir, 'analysis_report.txt')
+    
+    with open(report_path, 'w') as f:
+        f.write("="*80 + "\n")
+        f.write("PREDICTION DISTRIBUTION ANALYSIS REPORT\n")
+        f.write("="*80 + "\n\n")
+        
+        # 总体趋势
+        f.write("1. OVERALL TRENDS\n")
+        f.write("-"*40 + "\n")
+        
+        for ckpt in checkpoints:
+            if ckpt in all_results:
+                f.write(f"\nCheckpoint {ckpt}:\n")
+                f.write(f"  Correct token prob: {np.mean(all_results[ckpt]['correct_token_prob']):.4f}\n")
+                f.write(f"  Effective choices: {np.mean(all_results[ckpt]['effective_choices']):.2f}\n")
+                f.write(f"  Entropy: {np.mean(all_results[ckpt]['entropy']):.4f}\n")
+                f.write(f"  Successor/Non-successor ratio: {np.mean(all_results[ckpt]['successor_vs_non_successor_ratio']):.2f}\n")
+        
+        # Exclusion vs Selection对比
+        f.write("\n\n2. EXCLUSION VS SELECTION PHASE COMPARISON\n")
+        f.write("-"*40 + "\n")
+        
+        exclusion_checkpoints = [c for c in checkpoints if c <= 40000 and c in all_results]
+        selection_checkpoints = [c for c in checkpoints if c > 40000 and c in all_results]
+        
+        if exclusion_checkpoints:
+            f.write("\nExclusion Phase (≤40k):\n")
+            for metric in ['correct_token_prob', 'effective_choices', 'entropy']:
+                avg_value = np.mean([np.mean(all_results[c][metric]) for c in exclusion_checkpoints])
+                f.write(f"  Avg {metric}: {avg_value:.4f}\n")
+        
+        if selection_checkpoints:
+            f.write("\nSelection Phase (>40k):\n")
+            for metric in ['correct_token_prob', 'effective_choices', 'entropy']:
+                avg_value = np.mean([np.mean(all_results[c][metric]) for c in selection_checkpoints])
+                f.write(f"  Avg {metric}: {avg_value:.4f}\n")
+        
+        # 关键发现
+        f.write("\n\n3. KEY FINDINGS\n")
+        f.write("-"*40 + "\n")
+        
+        # 检查是否有明显的转变
+        if exclusion_checkpoints and selection_checkpoints:
+            exclusion_choices = np.mean([np.mean(all_results[c]['effective_choices']) for c in exclusion_checkpoints])
+            selection_choices = np.mean([np.mean(all_results[c]['effective_choices']) for c in selection_checkpoints])
+            
+            if selection_choices > exclusion_choices * 1.5:
+                f.write("\n✓ Evidence of transition from Exclusion to Selection:\n")
+                f.write(f"  Effective choices increased from {exclusion_choices:.2f} to {selection_choices:.2f}\n")
+            else:
+                f.write("\n✗ No clear evidence of Exclusion to Selection transition:\n")
+                f.write(f"  Effective choices remained similar: {exclusion_choices:.2f} vs {selection_choices:.2f}\n")
+    
+    print(f"Saved report: {report_path}")
 
 def main():
     # 扩展要分析的checkpoint范围
@@ -472,7 +625,14 @@ def main():
         print(f"  Avg effective choices: {np.mean(results['effective_choices']):.2f}")
         print(f"  Top-5 concentration: {np.mean(results['top5_concentration']):.4f}")
     
-    # 2. 分析分布特征
+    # 2. 绘制并保存关键指标总结图
+    print("\n" + "="*80)
+    print("PLOTTING KEY METRICS SUMMARY")
+    print("="*80)
+    
+    plot_key_metrics_summary(all_results, checkpoints)
+    
+    # 3. 分析分布特征
     print("\n" + "="*80)
     print("ANALYZING DISTRIBUTION CHARACTERISTICS")
     print("="*80)
@@ -480,7 +640,7 @@ def main():
     metrics = analyze_distribution_characteristics(all_results, checkpoints)
     plot_distribution_metrics(metrics)
     
-    # 3. 可视化具体的概率分布演变
+    # 4. 可视化具体的概率分布演变
     print("\n" + "="*80)
     print("VISUALIZING PROBABILITY DISTRIBUTIONS")
     print("="*80)
@@ -488,42 +648,14 @@ def main():
     visualize_probability_distributions(test_samples, 
                                       [10000, 20000, 30000, 40000, 50000, 70000, 90000, 100000])
     
-    # 4. 特别分析Exclusion到Selection的转变
+    # 5. 保存分析报告
     print("\n" + "="*80)
-    print("EXCLUSION TO SELECTION TRANSITION ANALYSIS")
+    print("SAVING ANALYSIS REPORT")
     print("="*80)
     
-    # 找出转变前后的代表性checkpoint
-    exclusion_checkpoints = [c for c in checkpoints if c <= 40000 and c in all_results]
-    selection_checkpoints = [c for c in checkpoints if c > 40000 and c in all_results]
+    save_summary_report(all_results, metrics, checkpoints)
     
-    if exclusion_checkpoints and selection_checkpoints:
-        # 对比平均指标
-        print("\nExclusion Phase (≤40k) Average Metrics:")
-        for metric in ['correct_token_prob', 'effective_choices', 'entropy']:
-            avg_value = np.mean([np.mean(all_results[c][metric]) for c in exclusion_checkpoints])
-            print(f"  {metric}: {avg_value:.4f}")
-        
-        print("\nSelection Phase (>40k) Average Metrics:")
-        for metric in ['correct_token_prob', 'effective_choices', 'entropy']:
-            avg_value = np.mean([np.mean(all_results[c][metric]) for c in selection_checkpoints])
-            print(f"  {metric}: {avg_value:.4f}")
-        
-        # 分析其他后继节点的概率变化
-        print("\nOther Successor Nodes Probability Analysis:")
-        for phase, phase_checkpoints in [("Exclusion", exclusion_checkpoints[-2:]), 
-                                        ("Selection", selection_checkpoints[:2])]:
-            other_probs = []
-            for c in phase_checkpoints:
-                if c in all_results and all_results[c]['other_successor_probs']:
-                    other_probs.extend(all_results[c]['other_successor_probs'])
-            
-            if other_probs:
-                print(f"{phase} phase - Other successors:")
-                print(f"  Mean: {np.mean(other_probs):.6f}")
-                print(f"  Median: {np.median(other_probs):.6f}")
-                print(f"  % > 0.01: {sum(p > 0.01 for p in other_probs) / len(other_probs) * 100:.1f}%")
-                print(f"  % > 0.001: {sum(p > 0.001 for p in other_probs) / len(other_probs) * 100:.1f}%")
+    print(f"\nAll plots and report saved to: {img_dir}")
 
 if __name__ == "__main__":
     main()
