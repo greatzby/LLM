@@ -1,0 +1,83 @@
+{
+  "1000": {
+    "correct": 37.4,
+    "syntax_error": 0.0,
+    "wrong_source_target": 0.0,
+    "start_mismatch": 0.0,
+    "end_mismatch": 2.9000000000000004,
+    "invalid_edge": 6.1,
+    "valid_but_wrong": 53.6
+  },
+  "5000": {
+    "correct": 40.5,
+    "syntax_error": 0.0,
+    "wrong_source_target": 0.0,
+    "start_mismatch": 0.0,
+    "end_mismatch": 2.4,
+    "invalid_edge": 2.1999999999999997,
+    "valid_but_wrong": 54.900000000000006
+  },
+  "10000": {
+    "correct": 38.6,
+    "syntax_error": 0.0,
+    "wrong_source_target": 0.0,
+    "start_mismatch": 0.0,
+    "end_mismatch": 2.1,
+    "invalid_edge": 2.1,
+    "valid_but_wrong": 57.199999999999996
+  },
+  "20000": {
+    "correct": 39.800000000000004,
+    "syntax_error": 0.0,
+    "wrong_source_target": 0.0,
+    "start_mismatch": 0.0,
+    "end_mismatch": 2.5,
+    "invalid_edge": 1.4000000000000001,
+    "valid_but_wrong": 56.3
+  },
+  "30000": {
+    "correct": 42.4,
+    "syntax_error": 0.0,
+    "wrong_source_target": 0.0,
+    "start_mismatch": 0.0,
+    "end_mismatch": 1.4000000000000001,
+    "invalid_edge": 1.5,
+    "valid_but_wrong": 54.7
+  },
+  "40000": {
+    "correct": 39.7,
+    "syntax_error": 0.0,
+    "wrong_source_target": 0.0,
+    "start_mismatch": 0.0,
+    "end_mismatch": 2.7,
+    "invalid_edge": 1.6,
+    "valid_but_wrong": 56.00000000000001
+  },
+  "50000": {
+    "correct": 42.0,
+    "syntax_error": 0.0,
+    "wrong_source_target": 0.0,
+    "start_mismatch": 0.0,
+    "end_mismatch": 1.7999999999999998,
+    "invalid_edge": 1.0,
+    "valid_but_wrong": 55.2
+  },
+  "70000": {
+    "correct": 41.3,
+    "syntax_error": 0.0,
+    "wrong_source_target": 0.0,
+    "start_mismatch": 0.0,
+    "end_mismatch": 1.7999999999999998,
+    "invalid_edge": 1.4000000000000001,
+    "valid_but_wrong": 55.50000000000001
+  },
+  "100000": {
+    "correct": 41.099999999999994,
+    "syntax_error": 0.0,
+    "wrong_source_target": 0.0,
+    "start_mismatch": 0.0,
+    "end_mismatch": 2.4,
+    "invalid_edge": 0.8999999999999999,
+    "valid_but_wrong": 55.60000000000001
+  }
+}
