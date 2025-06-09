@@ -1,73 +1,78 @@
 {
   "1000": {
     "correct": [],
-    "syntax_error": [],
+    "syntax_error": [
+      {
+        "prediction": "69 87 69",
+        "ground_truth": "69 87 69 75 78 81 87"
+      }
+    ],
     "wrong_source_target": [],
     "start_mismatch": [],
     "end_mismatch": [
       {
-        "prediction": "14 93 14 15 59 98",
-        "ground_truth": "14 93 14 21 72 78 85 89 93"
+        "prediction": "11 78 11 73 26 39",
+        "ground_truth": "11 78 11 57 61 78"
       },
       {
-        "prediction": "1 62 1 8 9 16 17 24 51",
-        "ground_truth": "1 62 1 8 9 16 17 24 31 33 62"
+        "prediction": "7 31 7 14 15 55",
+        "ground_truth": "7 31 7 8 9 16 17 24 31"
       },
       {
-        "prediction": "32 73 32 41 92",
-        "ground_truth": "32 73 32 42 68 73"
+        "prediction": "7 24 7 15 55",
+        "ground_truth": "7 24 7 8 24"
       },
       {
-        "prediction": "26 87 26 42 59 91",
-        "ground_truth": "26 87 26 31 65 75 78 81 87"
+        "prediction": "46 58 46 52 71",
+        "ground_truth": "46 58 46 52 58"
       },
       {
-        "prediction": "8 92 8 69 75 78 81 87 73",
-        "ground_truth": "8 92 8 68 73 92"
+        "prediction": "10 46 10 26 49",
+        "ground_truth": "10 46 10 32 41 46"
       }
     ],
     "invalid_edge": [
       {
-        "prediction": "28 72 28 72",
-        "ground_truth": "28 72 28 41 63 72"
+        "prediction": "6 42 6 9 16 17 42",
+        "ground_truth": "6 42 6 16 25 36 42"
       },
       {
-        "prediction": "10 80 10 21 42 74 80",
-        "ground_truth": "10 80 10 32 42 74 80"
+        "prediction": "40 91 40 80 84 90 91",
+        "ground_truth": "40 91 40 63 72 78 81 87 91"
       },
       {
-        "prediction": "6 94 6 82 91 94",
-        "ground_truth": "6 94 6 22 91 94"
+        "prediction": "6 62 6 10 31 33 62",
+        "ground_truth": "6 62 6 9 16 17 20 33 62"
       },
       {
-        "prediction": "26 92 26 84 64 68 73 92",
-        "ground_truth": "26 92 26 31 33 34 71 92"
+        "prediction": "44 79 44 48 85 79",
+        "ground_truth": "44 79 44 57 69 79"
       },
       {
-        "prediction": "30 89 30 45 89",
-        "ground_truth": "30 89 30 61 78 85 89"
+        "prediction": "10 52 10 26 52",
+        "ground_truth": "10 52 10 32 41 46 52"
       }
     ],
     "valid_but_wrong": [
       {
-        "prediction": "7 67 7 15 55 67",
-        "ground_truth": "7 67 7 14 15 22 51 52 58 67"
+        "prediction": "20 70 20 53 70",
+        "ground_truth": "20 70 20 28 41 46 49 66 70"
       },
       {
-        "prediction": "18 76 18 25 75 76",
-        "ground_truth": "18 76 18 34 50 69 75 76"
+        "prediction": "46 80 46 52 58 67 80",
+        "ground_truth": "46 80 46 52 71 80"
       },
       {
-        "prediction": "37 93 37 80 85 89 93",
-        "ground_truth": "37 93 37 57 69 75 78 85 89 93"
+        "prediction": "42 90 42 74 79 84 90",
+        "ground_truth": "42 90 42 74 80 84 90"
       },
       {
-        "prediction": "4 48 4 5 9 44 48",
-        "ground_truth": "4 48 4 8 15 44 48"
+        "prediction": "24 72 24 53 55 63 72",
+        "ground_truth": "24 72 24 46 49 72"
       },
       {
-        "prediction": "14 59 14 15 25 36 42 59",
-        "ground_truth": "14 59 14 21 42 59"
+        "prediction": "26 96 26 42 74 80 96",
+        "ground_truth": "26 96 26 55 74 80 96"
       }
     ]
   },
@@ -78,68 +83,68 @@
     "start_mismatch": [],
     "end_mismatch": [
       {
-        "prediction": "7 31 7 8 15 44",
-        "ground_truth": "7 31 7 8 9 16 17 24 31"
+        "prediction": "31 85 31 33 34 97",
+        "ground_truth": "31 85 31 33 34 71 80 85"
       },
       {
-        "prediction": "26 34 26 31 33 34 50",
-        "ground_truth": "26 34 26 31 33 34"
+        "prediction": "6 81 6 44 57 69",
+        "ground_truth": "6 81 6 46 72 78 81"
       },
       {
-        "prediction": "14 64 14 28 30 35",
-        "ground_truth": "14 64 14 15 25 47 64"
+        "prediction": "6 86 6 46 52",
+        "ground_truth": "6 86 6 80 84 86"
       },
       {
-        "prediction": "6 99 6 34 50 69",
-        "ground_truth": "6 99 6 22 51 52 58 67 87 99"
+        "prediction": "75 99 75 78 81 87 62",
+        "ground_truth": "75 99 75 78 81 87 99"
       },
       {
-        "prediction": "17 83 17 24 33 36 42 74 80 85",
-        "ground_truth": "17 83 17 20 33 62 83"
+        "prediction": "16 63 16 17 49 72",
+        "ground_truth": "16 63 16 25 46 63"
       }
     ],
     "invalid_edge": [
       {
-        "prediction": "10 84 10 71 80 84",
-        "ground_truth": "10 84 10 42 74 79 84"
-      },
-      {
-        "prediction": "7 65 7 14 21 39 65",
+        "prediction": "7 65 7 14 28 30 39 65",
         "ground_truth": "7 65 7 8 15 22 23 65"
       },
       {
-        "prediction": "14 98 14 21 83 85 89 93 98",
-        "ground_truth": "14 98 14 61 78 85 89 93 98"
+        "prediction": "28 94 28 23 74 91 94",
+        "ground_truth": "28 94 28 69 75 78 81 87 91 94"
       },
       {
-        "prediction": "4 62 4 62",
-        "ground_truth": "4 62 4 5 9 16 17 20 33 62"
+        "prediction": "1 95 1 8 24 78 85 89 95",
+        "ground_truth": "1 95 1 69 75 76 95"
       },
       {
-        "prediction": "10 64 10 42 64",
-        "ground_truth": "10 64 10 15 22 23 64"
+        "prediction": "84 98 84 98",
+        "ground_truth": "84 98 84 90 91 98"
+      },
+      {
+        "prediction": "6 78 6 41 63 72 78",
+        "ground_truth": "6 78 6 46 72 78"
       }
     ],
     "valid_but_wrong": [
       {
-        "prediction": "15 54 15 22 51 54",
-        "ground_truth": "15 54 15 22 28 51 54"
+        "prediction": "28 92 28 41 46 52 71 92",
+        "ground_truth": "28 92 28 41 46 52 58 92"
       },
       {
-        "prediction": "14 46 14 15 22 28 41 46",
-        "ground_truth": "14 46 14 15 25 46"
+        "prediction": "1 84 1 23 74 79 84",
+        "ground_truth": "1 84 1 69 79 84"
       },
       {
-        "prediction": "25 93 25 47 89 93",
-        "ground_truth": "25 93 25 61 78 85 89 93"
+        "prediction": "34 95 34 71 95",
+        "ground_truth": "34 95 34 50 60 95"
       },
       {
-        "prediction": "8 73 8 9 73",
-        "ground_truth": "8 73 8 50 73"
+        "prediction": "6 85 6 46 63 75 78 85",
+        "ground_truth": "6 85 6 9 58 83 85"
       },
       {
-        "prediction": "12 96 12 24 33 34 96",
-        "ground_truth": "12 96 12 28 67 80 96"
+        "prediction": "22 94 22 51 78 81 87 91 94",
+        "ground_truth": "22 94 22 28 43 57 61 94"
       }
     ]
   },
@@ -150,68 +155,68 @@
     "start_mismatch": [],
     "end_mismatch": [
       {
-        "prediction": "2 80 2 4 69 75",
-        "ground_truth": "2 80 2 4 80"
+        "prediction": "45 94 45 91",
+        "ground_truth": "45 94 45 91 94"
       },
       {
-        "prediction": "30 93 30 53 55 67 87 91",
-        "ground_truth": "30 93 30 53 66 70 89 93"
+        "prediction": "2 22 2 4 5 9 16 17 20 28",
+        "ground_truth": "2 22 2 4 8 15 22"
       },
       {
-        "prediction": "8 61 8 41 78",
-        "ground_truth": "8 61 8 15 22 23 43 57 61"
+        "prediction": "24 55 24 33 62",
+        "ground_truth": "24 55 24 53 55"
       },
       {
-        "prediction": "56 76 56 58 68 73 92 95",
-        "ground_truth": "56 76 56 65 75 76"
+        "prediction": "5 49 5 9 16 17 74",
+        "ground_truth": "5 49 5 9 16 17 49"
       },
       {
-        "prediction": "4 59 4 65",
-        "ground_truth": "4 59 4 25 36 42 59"
+        "prediction": "22 69 22 51 52 58 68",
+        "ground_truth": "22 69 22 23 69"
       }
     ],
     "invalid_edge": [
       {
-        "prediction": "2 17 2 2 4 8 9 16 17",
-        "ground_truth": "2 17 2 4 5 9 16 17"
+        "prediction": "29 91 29 61 78 81 87 91",
+        "ground_truth": "29 91 29 31 65 75 78 81 87 91"
       },
       {
-        "prediction": "18 85 18 30 69 75 78 85",
-        "ground_truth": "18 85 18 30 61 78 85"
+        "prediction": "2 9 2 24 2 4 5 9",
+        "ground_truth": "2 9 2 4 5 9"
       },
       {
-        "prediction": "2 91 2 4 84 90 91",
-        "ground_truth": "2 91 2 77 87 91"
+        "prediction": "38 96 38 49 47 64 68 96",
+        "ground_truth": "38 96 38 49 68 96"
       },
       {
-        "prediction": "20 65 20 39 65 75 65 75 65",
-        "ground_truth": "20 65 20 39 65"
+        "prediction": "45 96 45 96",
+        "ground_truth": "45 96 45 88 96"
       },
       {
-        "prediction": "14 65 14 21 39 65",
-        "ground_truth": "14 65 14 15 22 23 39 65"
+        "prediction": "9 88 9 16 25 71 2 4 12 24 46 49 66 88",
+        "ground_truth": "9 88 9 16 25 46 49 66 88"
       }
     ],
     "valid_but_wrong": [
       {
-        "prediction": "10 54 10 15 22 28 51 54",
-        "ground_truth": "10 54 10 12 28 51 54"
+        "prediction": "21 97 21 42 74 80 85 97",
+        "ground_truth": "21 97 21 62 83 85 97"
       },
       {
-        "prediction": "52 95 52 76 95",
-        "ground_truth": "52 95 52 58 92 95"
+        "prediction": "16 79 16 25 36 42 74 79",
+        "ground_truth": "16 79 16 56 58 79"
       },
       {
-        "prediction": "13 99 13 50 69 99",
-        "ground_truth": "13 99 13 70 87 99"
+        "prediction": "40 93 40 62 83 85 89 93",
+        "ground_truth": "40 93 40 62 74 80 85 89 93"
       },
       {
-        "prediction": "14 74 14 15 25 36 42 74",
-        "ground_truth": "14 74 14 21 42 74"
+        "prediction": "20 87 20 28 30 35 42 69 75 78 81 87",
+        "ground_truth": "20 87 20 28 30 81 87"
       },
       {
-        "prediction": "19 76 19 48 75 76",
-        "ground_truth": "19 76 19 33 34 50 69 75 76"
+        "prediction": "40 74 40 55 74",
+        "ground_truth": "40 74 40 62 74"
       }
     ]
   },
@@ -222,68 +227,68 @@
     "start_mismatch": [],
     "end_mismatch": [
       {
-        "prediction": "4 76 4 25 36 42",
-        "ground_truth": "4 76 4 27 46 49 76"
+        "prediction": "14 22 14 28",
+        "ground_truth": "14 22 14 15 22"
       },
       {
-        "prediction": "52 95 52 90 91 94",
-        "ground_truth": "52 95 52 58 92 95"
+        "prediction": "70 98 70 89",
+        "ground_truth": "70 98 70 79 84 90 91 98"
       },
       {
-        "prediction": "27 98 27 51 54 57 69 79 84 90",
-        "ground_truth": "27 98 27 80 85 89 93 98"
+        "prediction": "10 23 10 12 24",
+        "ground_truth": "10 23 10 19 23"
       },
       {
-        "prediction": "11 87 11 29 77",
-        "ground_truth": "11 87 11 55 63 75 78 81 87"
+        "prediction": "2 31 2 4 5 9 16 17 20 33",
+        "ground_truth": "2 31 2 4 5 9 16 17 24 31"
       },
       {
-        "prediction": "45 98 45 91",
-        "ground_truth": "45 98 45 91 98"
+        "prediction": "14 92 14 15 22 23 72 78 85",
+        "ground_truth": "14 92 14 28 30 35 42 68 73 92"
       }
     ],
     "invalid_edge": [
       {
-        "prediction": "44 94 44 87 91 94",
-        "ground_truth": "44 94 44 78 81 87 91 94"
+        "prediction": "4 79 4 42 74 80 42 74 80 84 74 79",
+        "ground_truth": "4 79 4 56 58 79"
       },
       {
-        "prediction": "32 73 32 71 73",
-        "ground_truth": "32 73 32 42 68 73"
+        "prediction": "23 78 23 78",
+        "ground_truth": "23 78 23 57 69 75 78"
       },
       {
-        "prediction": "29 94 29 80 82 91 94",
-        "ground_truth": "29 94 29 31 33 34 68 94"
+        "prediction": "26 83 26 31 33 36 42 83",
+        "ground_truth": "26 83 26 31 33 62 83"
       },
       {
-        "prediction": "4 91 4 20 53 86 91",
-        "ground_truth": "4 91 4 56 65 75 78 81 87 91"
+        "prediction": "15 99 15 70 87 99",
+        "ground_truth": "15 99 15 44 57 61 78 81 87 99"
       },
       {
-        "prediction": "30 90 30 45 70 79 84 90",
-        "ground_truth": "30 90 30 35 42 69 79 84 90"
+        "prediction": "62 94 62 67 80 82 91 94",
+        "ground_truth": "62 94 62 74 80 82 91 94"
       }
     ],
     "valid_but_wrong": [
       {
-        "prediction": "52 82 52 71 80 82",
-        "ground_truth": "52 82 52 58 67 80 82"
+        "prediction": "6 81 6 34 50 69 75 78 81",
+        "ground_truth": "6 81 6 46 72 78 81"
       },
       {
-        "prediction": "40 89 40 62 74 80 85 89",
-        "ground_truth": "40 89 40 55 63 75 89"
+        "prediction": "11 69 11 37 69",
+        "ground_truth": "11 69 11 37 57 69"
       },
       {
-        "prediction": "6 62 6 16 17 19 33 62",
-        "ground_truth": "6 62 6 9 16 17 20 33 62"
+        "prediction": "18 89 18 25 61 78 85 89",
+        "ground_truth": "18 89 18 34 71 89"
       },
       {
-        "prediction": "26 99 26 55 67 87 99",
-        "ground_truth": "26 99 26 81 87 99"
+        "prediction": "7 65 7 8 15 22 23 39 65",
+        "ground_truth": "7 65 7 8 15 22 23 65"
       },
       {
-        "prediction": "16 67 16 17 20 53 55 67",
-        "ground_truth": "16 67 16 56 58 67"
+        "prediction": "25 79 25 36 42 74 79",
+        "ground_truth": "25 79 25 66 70 79"
       }
     ]
   },
@@ -294,68 +299,68 @@
     "start_mismatch": [],
     "end_mismatch": [
       {
-        "prediction": "7 24 7 8 9 16 17 24 31",
-        "ground_truth": "7 24 7 8 24"
+        "prediction": "2 69 2 55 74",
+        "ground_truth": "2 69 2 4 21 42 69"
       },
       {
-        "prediction": "70 93 70 89",
-        "ground_truth": "70 93 70 89 93"
+        "prediction": "41 86 41 46 49 84 90",
+        "ground_truth": "41 86 41 67 86"
       },
       {
-        "prediction": "45 98 45 91",
-        "ground_truth": "45 98 45 91 98"
+        "prediction": "7 84 7 14 28 75 78 81",
+        "ground_truth": "7 84 7 35 42 69 79 84"
       },
       {
-        "prediction": "41 68 41 73 92",
-        "ground_truth": "41 68 41 46 52 58 68"
+        "prediction": "16 59 16 28",
+        "ground_truth": "16 59 16 28 30 35 42 59"
       },
       {
-        "prediction": "2 53 2 55 67",
-        "ground_truth": "2 53 2 24 53"
+        "prediction": "12 31 12 24 31 33",
+        "ground_truth": "12 31 12 26 31"
       }
     ],
     "invalid_edge": [
       {
-        "prediction": "30 68 30 53 55 68",
-        "ground_truth": "30 68 30 35 42 68"
+        "prediction": "2 22 2 4 5 9 22",
+        "ground_truth": "2 22 2 4 8 15 22"
       },
       {
-        "prediction": "10 46 10 19 41 46",
-        "ground_truth": "10 46 10 32 41 46"
+        "prediction": "4 76 4 30 35 76",
+        "ground_truth": "4 76 4 27 46 49 76"
       },
       {
-        "prediction": "8 99 8 67 87 99",
-        "ground_truth": "8 99 8 9 16 25 66 70 87 99"
+        "prediction": "17 82 17 20 35 42 74 80 82",
+        "ground_truth": "17 82 17 53 55 74 80 82"
       },
       {
-        "prediction": "6 42 6 27 36 42",
-        "ground_truth": "6 42 6 16 25 36 42"
+        "prediction": "9 97 9 70 96 97",
+        "ground_truth": "9 97 9 16 47 64 68 97"
       },
       {
-        "prediction": "6 98 6 22 22 98",
-        "ground_truth": "6 98 6 27 46 89 93 98"
+        "prediction": "16 86 16 17 53 9 58 79 84 86",
+        "ground_truth": "16 86 16 25 46 49 84 86"
       }
     ],
     "valid_but_wrong": [
       {
-        "prediction": "37 91 37 81 87 91",
-        "ground_truth": "37 91 37 69 79 84 86 91"
+        "prediction": "6 55 6 9 16 17 19 23 53 55",
+        "ground_truth": "6 55 6 22 23 53 55"
       },
       {
-        "prediction": "1 36 1 8 9 16 17 19 33 36",
-        "ground_truth": "1 36 1 8 9 16 17 20 33 36"
+        "prediction": "58 90 58 67 80 84 90",
+        "ground_truth": "58 90 58 79 84 90"
       },
       {
-        "prediction": "18 85 18 25 46 63 75 78 85",
-        "ground_truth": "18 85 18 30 61 78 85"
+        "prediction": "12 96 12 80 96",
+        "ground_truth": "12 96 12 28 67 80 96"
       },
       {
-        "prediction": "2 17 2 4 8 9 16 17",
-        "ground_truth": "2 17 2 4 5 9 16 17"
+        "prediction": "8 61 8 15 44 57 61",
+        "ground_truth": "8 61 8 15 22 23 43 57 61"
       },
       {
-        "prediction": "2 35 2 4 8 9 16 28 30 35",
-        "ground_truth": "2 35 2 4 5 9 16 28 30 35"
+        "prediction": "47 87 47 64 68 87",
+        "ground_truth": "47 87 47 81 87"
       }
     ]
   },
@@ -366,68 +371,68 @@
     "start_mismatch": [],
     "end_mismatch": [
       {
-        "prediction": "5 96 5 9 23 39 65 75 78 85",
-        "ground_truth": "5 96 5 34 96"
+        "prediction": "8 53 8 15 22 28 30 35",
+        "ground_truth": "8 53 8 24 53"
       },
       {
-        "prediction": "33 98 33 62 83 85",
-        "ground_truth": "33 98 33 34 71 80 85 89 93 98"
+        "prediction": "10 49 10 15 22 28 51 54 57 91",
+        "ground_truth": "10 49 10 12 24 46 49"
       },
       {
-        "prediction": "27 84 27 80 84 90",
-        "ground_truth": "27 84 27 51 52 71 80 84"
+        "prediction": "10 41 10 32 41 46",
+        "ground_truth": "10 41 10 32 41"
       },
       {
-        "prediction": "2 69 2 4 27 46 49",
-        "ground_truth": "2 69 2 4 21 42 69"
+        "prediction": "45 94 45 91",
+        "ground_truth": "45 94 45 91 94"
       },
       {
-        "prediction": "40 75 40 59 76",
-        "ground_truth": "40 75 40 55 63 75"
+        "prediction": "2 23 2 4 12 26 49",
+        "ground_truth": "2 23 2 4 5 9 23"
       }
     ],
     "invalid_edge": [
       {
-        "prediction": "8 25 8 9 16 17 24 8 9 16 25",
-        "ground_truth": "8 25 8 9 16 25"
+        "prediction": "2 54 2 4 25 20 28 51 54",
+        "ground_truth": "2 54 2 4 8 15 22 51 54"
       },
       {
-        "prediction": "8 92 8 15 70 73 92",
-        "ground_truth": "8 92 8 68 73 92"
+        "prediction": "16 99 16 17 53 66 44 48 75 78 81 87 99",
+        "ground_truth": "16 99 16 56 65 75 78 81 87 99"
       },
       {
-        "prediction": "44 84 44 69 79 84",
-        "ground_truth": "44 84 44 57 69 79 84"
+        "prediction": "10 79 10 15 70 79",
+        "ground_truth": "10 79 10 42 69 79"
       },
       {
-        "prediction": "4 91 4 12 79 84 90 91",
-        "ground_truth": "4 91 4 56 65 75 78 81 87 91"
+        "prediction": "6 17 6 16 17 20 17",
+        "ground_truth": "6 17 6 9 16 17"
       },
       {
-        "prediction": "51 95 51 52 58 83 76 95",
-        "ground_truth": "51 95 51 54 68 73 92 95"
+        "prediction": "9 97 9 44 78 85 97 97",
+        "ground_truth": "9 97 9 16 47 64 68 97"
       }
     ],
     "valid_but_wrong": [
       {
-        "prediction": "63 91 63 75 78 81 87 91",
-        "ground_truth": "63 91 63 72 78 81 87 91"
+        "prediction": "30 82 30 53 55 67 80 82",
+        "ground_truth": "30 82 30 35 42 74 80 82"
       },
       {
-        "prediction": "17 93 17 24 78 85 89 93",
-        "ground_truth": "17 93 17 24 83 85 89 93"
+        "prediction": "21 84 21 62 74 80 84",
+        "ground_truth": "21 84 21 80 84"
       },
       {
-        "prediction": "11 97 11 29 88 96 97",
-        "ground_truth": "11 97 11 66 85 97"
+        "prediction": "31 85 31 33 62 74 80 85",
+        "ground_truth": "31 85 31 33 34 71 80 85"
       },
       {
-        "prediction": "14 35 14 28 30 35",
-        "ground_truth": "14 35 14 15 22 28 30 35"
+        "prediction": "8 30 8 9 16 17 20 28 30",
+        "ground_truth": "8 30 8 9 16 28 30"
       },
       {
-        "prediction": "21 90 21 62 74 80 84 90",
-        "ground_truth": "21 90 21 80 84 90"
+        "prediction": "23 93 23 72 78 85 89 93",
+        "ground_truth": "23 93 23 57 61 78 85 89 93"
       }
     ]
   },
@@ -438,68 +443,68 @@
     "start_mismatch": [],
     "end_mismatch": [
       {
-        "prediction": "9 17 9 16 17 20 20 17 20 17 20 17 20",
+        "prediction": "45 98 45 91",
+        "ground_truth": "45 98 45 91 98"
+      },
+      {
+        "prediction": "9 17 9 16 17 24",
         "ground_truth": "9 17 9 16 17"
       },
       {
-        "prediction": "36 95 36 85 89 93",
-        "ground_truth": "36 95 36 42 68 73 92 95"
+        "prediction": "11 59 11 29",
+        "ground_truth": "11 59 11 37 59"
       },
       {
-        "prediction": "11 34 11 29",
-        "ground_truth": "11 34 11 29 31 33 34"
+        "prediction": "2 22 2 4 5 9 16 17 68",
+        "ground_truth": "2 22 2 4 8 15 22"
       },
       {
-        "prediction": "10 28 10 15 22",
-        "ground_truth": "10 28 10 12 28"
-      },
-      {
-        "prediction": "45 96 45 88",
-        "ground_truth": "45 96 45 88 96"
+        "prediction": "71 98 71 89",
+        "ground_truth": "71 98 71 79 84 86 98"
       }
     ],
     "invalid_edge": [
       {
-        "prediction": "2 48 2 4 8 15 44 57 48",
-        "ground_truth": "2 48 2 4 8 15 44 48"
+        "prediction": "6 97 6 34 82 0 23 53 55 74 80 96 97",
+        "ground_truth": "6 97 6 27 51 52 96 97"
       },
       {
-        "prediction": "12 94 12 26 84 30 53 55 67 87 91 94",
-        "ground_truth": "12 94 12 69 79 84 90 91 94"
+        "prediction": "10 23 10 12 23",
+        "ground_truth": "10 23 10 19 23"
       },
       {
-        "prediction": "32 96 32 67 80 96",
-        "ground_truth": "32 96 32 71 80 96"
+        "prediction": "32 64 32 47 64 47 64",
+        "ground_truth": "32 64 32 47 64"
       },
       {
-        "prediction": "41 93 41 75 78 85 89 93",
-        "ground_truth": "41 93 41 78 85 89 93"
+        "prediction": "2 85 2 4 61 78 85",
+        "ground_truth": "2 85 2 55 67 80 85"
       },
       {
-        "prediction": "8 62 8 15 22 28 30 33 62",
-        "ground_truth": "8 62 8 9 16 17 20 33 62"
+        "prediction": "10 57 10 12 43 57",
+        "ground_truth": "10 57 10 44 57"
       }
     ],
     "valid_but_wrong": [
       {
-        "prediction": "62 93 62 75 89 93",
-        "ground_truth": "62 93 62 75 78 85 89 93"
+        "prediction": "28 58 28 51 52 58",
+        "ground_truth": "28 58 28 41 46 52 58"
       },
       {
-        "prediction": "51 95 51 54 57 69 75 76 95",
-        "ground_truth": "51 95 51 54 68 73 92 95"
+        "prediction": "28 74 28 30 35 42 74",
+        "ground_truth": "28 74 28 30 53 55 74"
       },
       {
-        "prediction": "20 91 20 82 91",
-        "ground_truth": "20 91 20 28 43 57 61 78 81 87 91"
+        "prediction": "58 89 58 83 85 89",
+        "ground_truth": "58 89 58 67 80 85 89"
       },
       {
-        "prediction": "27 78 27 46 72 78",
-        "ground_truth": "27 78 27 54 61 78"
+        "prediction": "12 33 12 24 31 33",
+        "ground_truth": "12 33 12 24 33"
       },
       {
-        "prediction": "7 47 7 8 9 16 25 47",
-        "ground_truth": "7 47 7 8 9 16 47"
+        "prediction": "21 86 21 80 84 86",
+        "ground_truth": "21 86 21 62 74 80 84 86"
       }
     ]
   },
@@ -510,68 +515,68 @@
     "start_mismatch": [],
     "end_mismatch": [
       {
-        "prediction": "28 79 28 75 76",
-        "ground_truth": "28 79 28 51 54 57 69 79"
+        "prediction": "35 99 35 76",
+        "ground_truth": "35 99 35 42 68 87 99"
       },
       {
-        "prediction": "10 57 10 26 31 48",
-        "ground_truth": "10 57 10 44 57"
+        "prediction": "9 17 9 16 17 78 9 16 17 89",
+        "ground_truth": "9 17 9 16 17"
       },
       {
-        "prediction": "4 22 4 5",
-        "ground_truth": "4 22 4 8 15 22"
-      },
-      {
-        "prediction": "7 73 7 14 15 25 46 49",
-        "ground_truth": "7 73 7 70 73"
+        "prediction": "32 64 32 47 64 68",
+        "ground_truth": "32 64 32 47 64"
       },
       {
         "prediction": "7 24 7 8 9 16 17 24 51",
         "ground_truth": "7 24 7 8 24"
+      },
+      {
+        "prediction": "4 31 4 8 9 16 17 20 33",
+        "ground_truth": "4 31 4 12 26 31"
       }
     ],
     "invalid_edge": [
       {
-        "prediction": "4 23 4 12 23",
-        "ground_truth": "4 23 4 5 9 16 17 19 23"
+        "prediction": "14 96 14 28 30 45 45 88 96",
+        "ground_truth": "14 96 14 88 96"
       },
       {
-        "prediction": "10 23 10 12 26 39 23",
-        "ground_truth": "10 23 10 19 23"
+        "prediction": "6 17 6 16 17 20 17",
+        "ground_truth": "6 17 6 9 16 17"
       },
       {
-        "prediction": "30 96 30 53 70 96",
-        "ground_truth": "30 96 30 45 88 96"
+        "prediction": "15 95 15 22 51 52 62 75 76 95",
+        "ground_truth": "15 95 15 59 76 95"
       },
       {
-        "prediction": "6 87 6 22 28 53 70 87",
-        "ground_truth": "6 87 6 46 63 75 78 81 87"
+        "prediction": "10 96 10 12 24 46 74 80 96",
+        "ground_truth": "10 96 10 15 22 51 52 71 80 96"
       },
       {
-        "prediction": "11 59 11 36 42 59",
-        "ground_truth": "11 59 11 37 59"
+        "prediction": "2 72 2 24 46 72 78 72",
+        "ground_truth": "2 72 2 24 53 55 63 72"
       }
     ],
     "valid_but_wrong": [
       {
-        "prediction": "7 33 7 8 9 16 17 24 33",
-        "ground_truth": "7 33 7 8 24 31 33"
+        "prediction": "40 79 40 55 74 79",
+        "ground_truth": "40 79 40 62 74 79"
       },
       {
-        "prediction": "37 93 37 43 57 69 75 89 93",
-        "ground_truth": "37 93 37 57 69 75 78 85 89 93"
+        "prediction": "24 89 24 78 85 89",
+        "ground_truth": "24 89 24 31 33 39 89"
       },
       {
-        "prediction": "2 33 2 24 31 33",
-        "ground_truth": "2 33 2 24 33"
+        "prediction": "71 85 71 80 85",
+        "ground_truth": "71 85 71 83 85"
       },
       {
-        "prediction": "79 91 79 84 90 91",
-        "ground_truth": "79 91 79 84 86 91"
+        "prediction": "9 66 9 23 53 66",
+        "ground_truth": "9 66 9 16 25 46 49 66"
       },
       {
-        "prediction": "4 81 4 5 47 81",
-        "ground_truth": "4 81 4 56 65 75 78 81"
+        "prediction": "30 78 30 61 78",
+        "ground_truth": "30 78 30 53 55 63 72 78"
       }
     ]
   },
@@ -582,68 +587,68 @@
     "start_mismatch": [],
     "end_mismatch": [
       {
-        "prediction": "17 85 17 20 33 36",
-        "ground_truth": "17 85 17 24 33 36 85"
+        "prediction": "9 17 9 16 17 20 9 16 17 20 17 19",
+        "ground_truth": "9 17 9 16 17"
       },
       {
-        "prediction": "6 84 6 9 16",
-        "ground_truth": "6 84 6 44 57 69 79 84"
+        "prediction": "21 95 21 72 73",
+        "ground_truth": "21 95 21 72 73 92 95"
       },
       {
-        "prediction": "15 61 15 25 61 78",
-        "ground_truth": "15 61 15 44 48 61"
+        "prediction": "19 79 19 33 36 42 74",
+        "ground_truth": "19 79 19 66 70 79"
       },
       {
-        "prediction": "19 78 19 48 82",
-        "ground_truth": "19 78 19 23 39 65 75 78"
+        "prediction": "81 91 81 87 91 94",
+        "ground_truth": "81 91 81 87 91"
       },
       {
-        "prediction": "5 44 5 9 16",
-        "ground_truth": "5 44 5 9 44"
+        "prediction": "17 41 17 20",
+        "ground_truth": "17 41 17 20 28 41"
       }
     ],
     "invalid_edge": [
       {
-        "prediction": "38 93 38 69 75 75 78 85 89 93",
-        "ground_truth": "38 93 38 69 75 78 85 89 93"
+        "prediction": "17 95 17 24 33 33 62 74 76 95",
+        "ground_truth": "17 95 17 49 72 73 92 95"
       },
       {
-        "prediction": "4 72 4 5 9 23 19 23 53 55 63 72",
-        "ground_truth": "4 72 4 27 46 72"
+        "prediction": "9 97 9 44 78 85 97 97",
+        "ground_truth": "9 97 9 16 47 64 68 97"
       },
       {
-        "prediction": "14 46 14 15 22 28 41 46 49 46",
-        "ground_truth": "14 46 14 15 25 46"
+        "prediction": "10 64 10 12 24 64",
+        "ground_truth": "10 64 10 15 22 23 64"
       },
       {
-        "prediction": "6 33 6 22 33",
-        "ground_truth": "6 33 6 9 16 17 19 33"
+        "prediction": "17 72 17 77 72",
+        "ground_truth": "17 72 17 49 72"
       },
       {
-        "prediction": "8 17 8 9 16 17 20 17",
-        "ground_truth": "8 17 8 9 16 17"
+        "prediction": "4 23 4 12 23",
+        "ground_truth": "4 23 4 5 9 16 17 19 23"
       }
     ],
     "valid_but_wrong": [
       {
-        "prediction": "19 76 19 48 75 76",
-        "ground_truth": "19 76 19 33 34 50 69 75 76"
+        "prediction": "38 96 38 49 66 96",
+        "ground_truth": "38 96 38 49 68 96"
       },
       {
-        "prediction": "7 75 7 46 63 75",
-        "ground_truth": "7 75 7 35 42 69 75"
+        "prediction": "20 89 20 28 43 57 69 75 89",
+        "ground_truth": "20 89 20 53 55 74 80 85 89"
       },
       {
-        "prediction": "23 90 23 57 69 79 84 90",
-        "ground_truth": "23 90 23 74 80 84 90"
+        "prediction": "20 70 20 53 66 70",
+        "ground_truth": "20 70 20 28 41 46 49 66 70"
       },
       {
-        "prediction": "74 84 74 79 84",
-        "ground_truth": "74 84 74 80 84"
+        "prediction": "19 94 19 66 70 86 91 94",
+        "ground_truth": "19 94 19 77 87 91 94"
       },
       {
-        "prediction": "41 99 41 63 75 78 81 87 99",
-        "ground_truth": "41 99 41 46 49 66 70 87 99"
+        "prediction": "17 76 17 19 23 69 75 76",
+        "ground_truth": "17 76 17 49 76"
       }
     ]
   }
